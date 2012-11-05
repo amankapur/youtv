@@ -8,23 +8,17 @@ $(document).on('ready', function(){
   	var query = inputs.serializeArray()[0].value;
   	
   	
-  	var url = "https://gdata.youtube.com/feeds/api/videos?q=" + query + "&key=" + dev_key;
-		console.log(url);
+  	var url = "https://gdata.youtube.com/feeds/api/videos?q=" + encodeURI(query) + "&key=" + dev_key;
 		$.get(url, function(data){
 
 			var entries = $(data).find('entry');
-			console.log(entries);
-  		for (var vid =0; vid < 3; vid++){
+  		for (var vid =0; vid < 10; vid++){
   			var entry = $(entries[vid]);
-  			console.log(entry);
-//  			console.log(entry.find("content"));
-  			var temp = entry.find("content")[1];
-  			console.log(temp);
+				var thumbnail = entry.find("thumbnail")[1];
+				var thumbnail_url = thumbnail.getAttribute('url');
+				var temp = entry.find("content")[1];
   			var vid_url = temp.getAttribute('url');
-  			console.log(url);
-  			var embed_url = "<object width='560' height='315'><param name='movie' value='" + vid_url + ";hl=en_US'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='"+ vid_url + "http://www.youtube.com/v/-kys635B4H8?version=3&amp;hl=en_US' type='application/x-shockwave-flash' width='560' height='315' allowscriptaccess='always' allowfullscreen='true'></embed></object>"
-  			
-  			var html = '<div class="row"> ' +embed_url +'</div>';
+  			var html = '<div class="row"> <img src = ' + thumbnail_url + '> <h2> Title </h2> </div>';
   			$("#yt_vids").append(html);
   			
   		}
