@@ -57,10 +57,11 @@ end
 
 
 post '/sync' do 
-	pos = params[:pos]  #pos is number 0 - 127 
-	if pos > -1 and pos < 128
-		client_buffer[Time.now] = pos
-		json({:foo => 'bar'}, :encoder => :to_json, :content_type => :js)
+	pos = params[:pos]  #pos is number 0 - 1
+	if pos >=0 and pos <=1
+		client_buffer[Time.now.iso8601] = pos
+	else 
+		"Error: pos is out of range"
 	end
 end
 
