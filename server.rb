@@ -14,18 +14,24 @@ client_buffer = {}
 thread = Thread.new(){
 	sp = SerialPort.new "/dev/ttyACM0", 9600
 	sp.write('hi')
-
+	puts 'hi'
 
 	while(1)
 		a = sp.read()
 		if a.include?('pause')
 			state = 'pause'
-			send_to_client = a
+			pos = a.split('|')[1].scan(/\d+/)
+			if pos != nil
+				arduino_buffer[Time.now.iso8601] = a.split('|')[1].scan(/\d+/)[0]
+			end
 		end
 
 		if a.include?('play')
 			state = 'sync'
-			send_to_client = a
+			pos = a.split('|')[1].scan(/\d+/)
+			if pos != nil
+				arduino_buffer[Time.now.iso8601] = a.split('|')[1].scan(/\d+/)[0]
+			end
 		end
 
 		if state == 'sync'
