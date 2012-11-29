@@ -11,41 +11,61 @@ arduino_buffer = {}
 send_to_client = ''
 client_buffer = {}
 
-thread = Thread.new(){
-	sp = SerialPort.new "/dev/ttyACM0", 9600
-	sp.write('hi')
-	puts 'hi'
+def getLast(hash)
+	if hash.length <1 
+		return 0
+	end
+	return hash.sort_by{|time, value| time}[-1][1] # sort ascending time
+end
 
-	while(1)
-		a = sp.read()
+	
+
+def sendSync(sp)
+	client = getLast(client_buffer)
+	server = getLast(server_buffer)
+
+	if ((server-client).abs/server * 100) < 2
+		sp.write('sync ' + getLast(client_buffer).to_s + ' -')
+	else
+		sp.write("null -")
+	end
+end
+
+thread = Thread.new() do 
+	sp = SerialPort.new "/dev/ttyACM0", 9600
+
+	while 1
+
+		a = ''	
+		b = '1'
+		while (b != '-') # keep reading till end char '-'
+			b = sp.getc
+			if (b!=nil)
+				a += b
+			end
+		end
+		# 'a' is the string read from arduino
+
 		if a.include?('pause')
 			state = 'pause'
-			pos = a.split('|')[1].scan(/\d+/)
+			pos = a[/\d+(?:\.\d+)?/]
 			if pos != nil
-				arduino_buffer[Time.now.iso8601] = a.split('|')[1].scan(/\d+/)[0]
+				arduino_buffer[Time.now.iso8601] = pos
 			end
 		end
 
 		if a.include?('play')
 			state = 'sync'
-			pos = a.split('|')[1].scan(/\d+/)
+			pos = a[/\d+(?:\.\d+)?/]
 			if pos != nil
-				arduino_buffer[Time.now.iso8601] = a.split('|')[1].scan(/\d+/)[0]
+				arduino_buffer[Time.now.iso8601] = pos
 			end
 		end
+	
+		sendSync(sp)
 
-		if state == 'sync'
-			sp.write('sync ' + getLast(client_buffer).to_s())
-		end
-	end
-}
-
-def getLast(hash)
-	if hash.length <1 
-		return 0
-	end
-	return hash.sort_by{|time, value| time}[-1][1]
-end
+	end # end while loop
+end #end thread
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
@@ -61,14 +81,7 @@ get '/state' do
 	{state: state, pos:getLast(arduino_buffer) }.to_json
 end
 
-
 post '/sync' do 
 	pos = params[:pos]  #pos is number 0 - 1
-	if pos >=0 and pos <=1
-		client_buffer[Time.now.iso8601] = pos
-	else 
-		"Error: pos is out of range"
-	end
+	client_buffer[Time.now.iso8601] = pos
 end
-
-
