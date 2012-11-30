@@ -20,19 +20,26 @@ end
 
 	
 
-def sendSync(sp)
+def sendSync(sp, client_buffer, arduino_buffer)
 	client = getLast(client_buffer)
-	server = getLast(server_buffer)
+	server = getLast(arduino_buffer)
+	
+	client = client.to_i
+	server = server.to_i
+	if server == 0
+		server = 1
+	end
 
 	if ((server-client).abs/server * 100) < 2
-		sp.write('sync ' + getLast(client_buffer).to_s + ' -')
+		sp.write('sync ' + getLast(client_buffer).to_s() + ' -')
 	else
 		sp.write("null -")
 	end
 end
 
-thread = Thread.new() do 
-	sp = SerialPort.new "/dev/ttyACM0", 9600
+Thread.new do 
+	
+	sp = SerialPort.new "/dev/ttyACM1", 9600
 
 	while 1
 
@@ -62,10 +69,10 @@ thread = Thread.new() do
 			end
 		end
 	
-		sendSync(sp)
+		sendSync(sp, client_buffer, arduino_buffer)
 
 	end # end while loop
-end #end thread
+end
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
