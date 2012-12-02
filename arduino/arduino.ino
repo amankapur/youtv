@@ -1,11 +1,12 @@
 #include <stdlib.h>
 
 #define BUTTON_PIN 3
+#define MOTOR_PIN 13
 
-int motor = 13;
+int motor = MOTOR_PIN;
 String state = "pause";
 float pos = 0.0;
-char pos2[4];
+char *pos2;
 String message;
 int buttonPin = BUTTON_PIN;
 
@@ -18,13 +19,17 @@ void setup()
  
 void loop()
 {
-  dtostrf (pos, '4', '2', pos2);
-  Serial.println(state + ' ' + pos2 + " -");
+  // send state and pos to server
+//  dtostrf (pos, '4', '2', pos2);
+//  Serial.println(state + ' ' + pos2 + " -");
   
-  if (Serial.available() >0){
-    message = chkSer('-'); 
-  }
+  // incoming message from server
+//  if (Serial.available() >0){
+    message = "Synch 0.21 -"; 
+    handleMessage(message);
+//}
   
+  // play/pause button press
   if (buttonPress(buttonPin)) {
    if (state == "pause") {
       state == "play";
@@ -32,12 +37,33 @@ void loop()
    else {state == "pause";}
   }
   
+  // slider position change
   if(userMovedSlider()){
    int new_pos = getPos(motor);
    }
   
 }
 
+// get position from mesg in string and float
+// this is JANKETY
+void handleMessage(String mesg) {
+  int i;
+  char *pch;
+  char msg[15];
+  Serial.println(mesg);
+  if (mesg.indexOf("l") > 0) return; //life is good, don't do anything
+  if (mesg.indexOf("y") >0) {
+    for (i = 0; i < mesg.length(); i++){
+      msg[i] = mesg[i];
+    }
+    pch = strtok (msg," ");
+    pch = strtok (NULL, " ");
+    pos2 = pch;
+    pos = atof(pos2);
+    Serial.println(pos);
+    Serial.println(pos2);
+  }
+}
 // Gets position from slider
 int getPos(int motor){
   return 0;
@@ -50,7 +76,7 @@ boolean userMovedSlider(){
 }
 
 
-
+// was button pressed?
 boolean buttonPress(int buttonPin){
  if (digitalRead(buttonPin) == HIGH) 
    {return true ;}
@@ -58,6 +84,8 @@ boolean buttonPress(int buttonPin){
   
 }
 
+// waits for all incoming bytes till char c
+// return string of data recevied
 String chkSer(char c){
   String content = "";
     char character;
