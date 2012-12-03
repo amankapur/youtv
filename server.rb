@@ -48,8 +48,6 @@ Thread.new do
         end
         str =  'length ' + vid_length + ' -'
         sp.write(str)
-        while 1
-        end
 
 	while 1
 

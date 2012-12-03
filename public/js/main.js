@@ -28,7 +28,6 @@ $(document).on('ready', function(){
     window.setInterval(function(){
         getState();
     }, 100);
-});
 
 function getState() {
     $.ajax({
@@ -40,7 +39,7 @@ function getState() {
             console.log("Did that just work?");
         }
     });
-
+   }
     /*$.ajax({
         type: 
     })*/
@@ -54,7 +53,7 @@ function getState() {
           //The pos has jumped more than expected, tell video to seek 
         }
     });*/
-}
+
 
 function postSync() {
   $.post('/sync')
@@ -64,3 +63,5 @@ function postSync() {
 function postLength() {
   $.post('/length')
 }
+
+});
