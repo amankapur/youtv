@@ -48,8 +48,6 @@ Thread.new do
         end
         str =  'length ' + vid_length + ' -'
         sp.write(str)
-        while 1
-        end
 
 	while 1
 
@@ -89,6 +87,7 @@ def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
 end
 
+register Sinatra::CrossOrigin
 
 configure do
   enable :cross_origin
