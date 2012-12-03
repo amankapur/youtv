@@ -98,3 +98,8 @@ post '/sync' do
 	pos = params[:pos]  #pos is number 0 - 1
 	client_buffer[Time.now.iso8601] = pos
 end
+
+options '/*' do 
+	response["Access-Control-Allow-Headers"] = "origin, x-requested-with, content-type"
+end
+
