@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'json' 
 require 'serialport'
 require 'thread'
@@ -77,6 +78,11 @@ end
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
+end
+
+
+configure do
+  enable :cross_origin
 end
 
 get '/' do 
