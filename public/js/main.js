@@ -31,6 +31,20 @@ $(document).on('ready', function(){
     }, 100);
 });
 
+function getState() {
+    $.ajax({
+        type: "GET",
+        url: "/state",
+        dataType: "json",
+        crossDomain: true,
+        success: function(data){
+            console.log("Did that just work?");
+        }
+    });
+
+    /*$.ajax({
+        type: 
+    })*/
 
     /*$.getJSON('localhost:4567/state', function(data){
         alert('got it');
