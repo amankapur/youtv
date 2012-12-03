@@ -87,7 +87,6 @@ def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
 end
 
-register Sinatra::CrossOrigin
 
 configure do
   enable :cross_origin
