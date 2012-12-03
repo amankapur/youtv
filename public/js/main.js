@@ -34,12 +34,17 @@ $(document).on('ready', function(){
 function getState() {
     $.ajax({
         type: "GET",
-        url: "localhost:4567/state",
+        url: "/state",
         dataType: "json",
+        crossDomain: true,
         success: function(data){
-            alert("Did that just work?");
+            console.log("Did that just work?");
         }
     });
+
+    /*$.ajax({
+        type: 
+    })*/
 
     /*$.getJSON('localhost:4567/state', function(data){
         alert('got it');
