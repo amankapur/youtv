@@ -8,6 +8,7 @@ require 'time'
 
 state = 'sync'
 
+vid_length = 0
 arduino_buffer = {}
 send_to_client = ''
 client_buffer = {}
@@ -40,7 +41,15 @@ end
 
 Thread.new do 
 	
-	sp = SerialPort.new "/dev/ttyACM1", 9600
+	sp = SerialPort.new "/dev/ttyACM0", 9600
+        
+        while vid_length == 0
+                vid_length = '23'
+        end
+        str =  'length ' + vid_length + ' -'
+        sp.write(str)
+        while 1
+        end
 
 	while 1
 
@@ -92,6 +101,10 @@ end
 get '/state' do
 	content_type :json
 	{state: state, pos:getLast(arduino_buffer) }.to_json
+end
+
+post '/length' do
+        vid_length = params[:len] 
 end
 
 post '/sync' do 

@@ -9,16 +9,23 @@ float pos = 0.0;
 char *pos2;
 String message;
 int buttonPin = BUTTON_PIN;
+int vid_length = 0;
 
 void setup()
 {
   pinMode(motor,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
-  Serial.println("pause 0.12 -");
+  //Serial.println("pause 0.12 -");
+  
+  message = chkSer('-');
+  //Serial.println(message);
+  //while(vid_length == 0){handleMessage(message);Serial.print('length: '); Serial.println(vid_length);}
+  //Serial.println("exit");
 }
 
 void loop()
 {
+  Serial.println("WTF");
   // send state and pos to server
   //  dtostrf (pos, '4', '2', pos2);
   //  Serial.println(state + ' ' + pos2 + " -");
@@ -64,6 +71,15 @@ void handleMessage(String mesg) {
     pos = atof(pos2);
     Serial.println(pos);
     Serial.println(pos2);
+  }
+  
+  if(mesg.indexOf('g') > 0){
+    for (i = 0; i < mesg.length(); i++){
+      msg[i] = mesg[i];
+     pch = strtok (msg," ");
+     pch = strtok (NULL, " ");
+     vid_length = atoi(pch);
+    }
   }
 }
 // Gets position from slider
