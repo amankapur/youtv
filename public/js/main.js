@@ -1,4 +1,3 @@
-var host = 'localhost:4567';
 var pos, lastpos = 0; //These need to be in an object with structure
 
 $(document).on('ready', function(){
@@ -29,7 +28,6 @@ $(document).on('ready', function(){
     window.setInterval(function(){
         getState();
     }, 100);
-});
 
 function getState() {
     $.ajax({
@@ -41,7 +39,7 @@ function getState() {
             console.log("Did that just work?");
         }
     });
-
+   }
     /*$.ajax({
         type: 
     })*/
@@ -65,3 +63,5 @@ function postSync() {
 function postLength() {
   $.post(host+'/length')
 }
+
+});
