@@ -31,15 +31,6 @@ $(document).on('ready', function(){
     }, 100);
 });
 
-function getState() {
-    $.ajax({
-        type: "GET",
-        url: "localhost:4567/state",
-        dataType: "json",
-        success: function(data){
-            alert("Did that just work?");
-        }
-    });
 
     /*$.getJSON('localhost:4567/state', function(data){
         alert('got it');
@@ -50,7 +41,7 @@ function getState() {
           //The pos has jumped more than expected, tell video to seek 
         }
     });*/
-}
+
 
 function postSync() {
   $.post(host+'/sync')
