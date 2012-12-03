@@ -27,41 +27,49 @@ $(document).on('ready', function(){
     });
     window.setInterval(function(){
         getState();
+        postSync();
+        postLength();
     }, 100);
+});
 
 function getState() {
     $.ajax({
         type: "GET",
         url: "/state",
         dataType: "json",
-        crossDomain: true,
         success: function(data){
             console.log("Did that just work?");
+            lastpos = pos;
+            pos = data.pos;
+            if (Math.abs(pos-lastpos) > 5) {
+                //The pos has jumped more than expected, tell video to seek 
+            }
         }
     });
-   }
-    /*$.ajax({
-        type: 
-    })*/
-
-    /*$.getJSON('localhost:4567/state', function(data){
-        alert('got it');
-        lastpos = pos;
-        pos = data.pos;
-
-        if (Math.abs(pos-lastpos) > 5) {
-          //The pos has jumped more than expected, tell video to seek 
-        }
-    });*/
-
+}
 
 function postSync() {
-  $.post('/sync')
+    $.ajax({
+        type: "POST",
+        url: "/sync",
+        dataType: "json",
+        success: function(data){
+            console.log("Did that just work?");
+            lastpos = pos;
+            //pos = data.pos;
+            if (Math.abs(pos-lastpos) > 5) {
+                //The pos has jumped more than expected, tell video to seek 
+            }
+        }
+    });
 }
 
 //Post video length in seconds
 function postLength() {
-  $.post('/length')
+    $.ajax({
+        type: "POST",
+        url: "/length",
+        dataType: "json",
+        data: {"len":100}
+    });
 }
-
-});
