@@ -1,4 +1,3 @@
-var host = 'localhost:4567';
 var pos, lastpos = 0; //These need to be in an object with structure
 
 $(document).on('ready', function(){
@@ -58,10 +57,10 @@ function getState() {
 }
 
 function postSync() {
-  $.post(host+'/sync')
+  $.post('/sync')
 }
 
 //Post video length in seconds
 function postLength() {
-  $.post(host+'/length')
+  $.post('/length')
 }
