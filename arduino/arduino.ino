@@ -44,19 +44,19 @@ void setup()
   // spin till we get video length
   while(vid_length == 0){
     message = chkSer('-');
-    Serial.println("message is " + message);
+    //Serial.println("message is " + message);
     handleMessage(message);
-    Serial.print("length: ");
-    Serial.println(vid_length);
+    //Serial.print("length: ");
+    //Serial.println(vid_length);
   }
   
 }
  
 void loop()
 {
-    
+  Serial.print(" ");
   Serial.print(state + ' ' );
-  Serial.print(0.4);
+  Serial.print(pos);
   Serial.println(" -");
   
  
@@ -64,6 +64,7 @@ void loop()
   if (Serial.available()){
       message = chkSer('-');
       handleMessage(message);
+      
     }
   
   // play/pause button press
@@ -88,7 +89,7 @@ void loop()
   if(userMovedSlider()){
     int new_pos = getPos();
   }
-  getPos();
+  pos = getPos();
   motorControl();
  
 }
@@ -100,8 +101,8 @@ void handleMessage(String mesg) {
   char *pch;
   char msg[15];
 //  Serial.println(mesg);
-  if (mesg.indexOf("l") > 0) return; //life is good, don't do anything
-  if (mesg.indexOf("y") >0) {
+  if (mesg.indexOf('u') > 0) return; //life is good, don't do anything
+  if (mesg.indexOf('s') >0) {
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
     }
@@ -119,7 +120,7 @@ void handleMessage(String mesg) {
     }
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
-     Serial.print("pch is ");
+     //Serial.print("pch is ");
      vid_length = atoi(pch);
     
   }
@@ -130,7 +131,7 @@ void handleMessage(String mesg) {
 int getPos(){
   ePosOld = ePos;
   ePos = mEncoder.read();
-  Serial.println(ePos);
+  //Serial.println(ePos);
   if (ePos > ticks){
     state = "reset";
   }

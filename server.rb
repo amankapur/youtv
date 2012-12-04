@@ -51,7 +51,7 @@ def getMessage(sp)
 	end
 	return a       
 end
-
+Thread.new do
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
         while (vid_length == 0) # spin till video length is set by client
@@ -64,19 +64,25 @@ end
 
        	while 1
                 a = getMessage(sp)
-                puts "a: " + a.to_s	
+
                 if a.include?('pause')
                 state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
+                        
+                        puts "a: " + a.to_s
+                        puts "pos is : " + pos.to_s
+                        pos = pos.to_f
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
-                                puts arduino_buffer
 			end
 		end
-
+                
 		if a.include?('play')
 			state = 'sync'
 			pos = a[/\d+(?:\.\d+)?/]
+                        puts "a: " + a.to_s
+                        puts "pos is : " + pos.to_s
+                        pos = pos.to_f 
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
 			end
@@ -85,7 +91,7 @@ end
 		sendSync(sp, client_buffer, arduino_buffer)
 
 	end # end while loop
-
+end
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals

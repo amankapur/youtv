@@ -5,6 +5,7 @@ var playerObj = null;
 
 $(document).on('ready', function(){
         postLength();
+        getState();
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
     $('#search').submit(function() {
         $("#yt_vids").html('');
@@ -32,13 +33,16 @@ $(document).on('ready', function(){
     });
 });
 
+window.setInterval(function(){
+        getState();
+}, 500);
 //Trying to allow for keyboard control of fullscreen activation (fullscreen needs to be in a user action.)
 window.onkeydown = fullScreenPlayer;
 //window.addEventListener('onkeydown', function (keyEvent) {
 function fullScreenPlayer(keyEvent) {
-    console.log('a');
+    //console.log('a');
     var keyCode = ('which' in event) ? event.which : event.keyCode;
-    console.log(keyCode);
+    //console.log(keyCode);
     if (keyCode == 70 && playerObj) {
         //playerObj.requestFullScreen();
         fullScreenApi.requestFullScreen(playerObj);
@@ -76,7 +80,7 @@ function getState() {
         url: "/state",
         dataType: "json",
         success: function(data){
-            //console.log(data);
+            console.log(data);
             lastpos = pos;
             pos = data.pos;
             laststate = state;
