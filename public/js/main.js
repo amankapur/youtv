@@ -1,7 +1,8 @@
-var pos, lastpos = 0; //These need to be in an object with structure
-var state, laststate = null;
+//var pos, lastpos = 0; //These need to be in an object with structure
+//var state, laststate = null;
 var serverLoop;
 var playerObj = null;
+int length, position;
 
 $(document).on('ready', function(){
         postLength();
@@ -33,39 +34,18 @@ $(document).on('ready', function(){
     });
 });
 
-window.setInterval(function(){
-        getState();
-}, 500);
-//Trying to allow for keyboard control of fullscreen activation (fullscreen needs to be in a user action.)
-window.onkeydown = fullScreenPlayer;
-//window.addEventListener('onkeydown', function (keyEvent) {
-function fullScreenPlayer(keyEvent) {
-    //console.log('a');
-    var keyCode = ('which' in event) ? event.which : event.keyCode;
-    //console.log(keyCode);
-    if (keyCode == 70 && playerObj) {
-        //playerObj.requestFullScreen();
-        fullScreenApi.requestFullScreen(playerObj);
-    }
-}
-
-function GetChar (event){
-            var keyCode = ('which' in event) ? event.which : event.keyCode;
-            alert ("The Unicode key code is: " + keyCode);
-        }
-
 function loadPlayer(vid_id) {
     // Lets Flash from another domain call JavaScript
     var params = { allowScriptAccess: "always" };
     // The element id of the Flash embed
     var atts = { id: "ytPlayer" };
-    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?version=3&enablejsapi=1&playerapiid=player1", 
-                       "videoDiv", "480", "295", "9", null, null, params, atts);
+    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?version=3&enablejsapi=1&playerapiid=ytPlayer", 
+                       "videoDiv", $(window).width().toString(), $(window).height().toString(), "9", null, null, params, atts);
     playerObj = $("object#ytPlayer");
+    toggleFullScreen();
 
     postLength();
 
-    window.clearInterval(serverLoop); //This really needs to be placed where the video is closed, not here.
     serverLoop = window.setInterval(function(){
         getState();
         postSync();
@@ -74,43 +54,78 @@ function loadPlayer(vid_id) {
     $("videoDiv")
 }
 
+/*function onYouTubePlayerReady(playerid) {
+    console.log('ready'+playerid);
+    if (ytPlayer) ytPlayer.playVideo();
+}*/
+
+function closePlayer() {
+    window.clearInterval(serverLoop);
+    $("#ytPlayer").replaceWith("<div id=\"videoDiv\"></div>")
+}
+    
+function toggleFullScreen() {
+    var videoElement = document.getElementById("ytPlayer");
+    if (!document.mozFullScreen && !document.webkitFullScreen) {
+        if (videoElement.mozRequestFullScreen) {
+            videoElement.mozRequestFullScreen();
+        } else {
+            videoElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    } else {
+        if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else {
+            document.webkitCancelFullScreen();
+        }
+    }
+}
+
 function getState() {
     $.ajax({
         type: "GET",
         url: "/state",
         dataType: "json",
         success: function(data){
-            console.log(data);
+            console.log(data.pos+','+data.state);
             lastpos = pos;
             pos = data.pos;
-            laststate = state;
-            state = data.state;
             if (Math.abs(pos-lastpos) > 5) {
                 //The pos has jumped more than expected, tell video to seek 
             }
-            if (state != laststate) {
-                //The state has changed and we should control the player
+            vidState = ytPlayer.getPlayerState();
+            if (data.state == "play" && vidState != 1 && vidState != 0) {
+                //The video should be playing
+                if (state == "play") ytPlayer.playVideo();
+            }
+            else if (data.state == "pause" && vidState != 2) {
+                ytPlayer.pauseVideo();
             }
         }
     });
 }
 
 function postSync() {
+    if (length) {
+        position = ytPlayer.getCurrentTime()/length;
+    }
+    else position = ytPlayer.getCurrentTime()/ytPlayer.getDuration();
     $.ajax({
         type: "POST",
         url: "/sync",
         dataType: "json",
-        data: {"pos" : 0}
+        data: {"pos" : position}
     });
 }
 
 //Post video length in seconds
 function postLength() {
+    length = ytPlayer.getDuration();
     $.ajax({
         type: "POST",
         url: "/length",
         dataType: "json",
-        data: {"len":100}
+        data: {"len":length}
     });
 }
 
