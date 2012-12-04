@@ -70,6 +70,7 @@ end
 			pos = a[/\d+(?:\.\d+)?/]
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
+                                puts arduino_buffer
 			end
 		end
 

@@ -142,6 +142,7 @@ int getPos(){
     state = "pause";
   }
   return ePos;
+}
  
 // checks if slider has been moved by user
 boolean userMovedSlider(){
