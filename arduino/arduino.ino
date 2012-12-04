@@ -41,7 +41,7 @@ void loop()
   // send state and pos to server
   //  dtostrf (pos, '4', '2', pos2);  
   Serial.print(state + ' ' );
-  Serial.print(pos2 )
+  Serial.print(pos2 );
   Serial.println(" -");
  
   // incoming message from server
@@ -152,9 +152,11 @@ String chkSer(char c){
     if(Serial.available() >0){
       character = Serial.read();
       content.concat(character);
-      //Serial.println(content);
- 
+     
     }
   }
+  Serial.print("content is : ");
+  Serial.println(content);
+ 
   return content;
 }
