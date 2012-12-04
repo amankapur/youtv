@@ -1,5 +1,4 @@
 #include <stdlib.h>
- 
 #define BUTTON_PIN 12
 #define MOTOR_PIN 13
  
@@ -10,12 +9,13 @@ char *pos2;
 String message = " ";
 int buttonPin = BUTTON_PIN;
 int vid_length = 0;
+<<<<<<< HEAD
 int pressed = 0;
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 long lastDebounceTime = 0;  // the last time the output pin was toggled
-long debounceDelay = 50;    // the debounce time; increase if the output flickers
- 
+long debounceDelay = 333;    // the debounce time; increase if the output flickers
+
 void setup()
 {
   pinMode(buttonPin, INPUT);
@@ -116,30 +116,16 @@ boolean userMovedSlider(){
  
 // was button pressed?
 boolean buttonPress(int buttonPin){
-  pressed = 0;
-  if (digitalRead(buttonPin) == HIGH)
-  {
-    return true ;
-  }
-  return false;
-//  int reading = digitalRead(buttonPin);
-////  Serial.println(reading);
-//
-//  if (reading != lastButtonState) {
-//    lastDebounceTime = millis();
-//  }
-// 
-//  if ((millis() - lastDebounceTime) > debounceDelay) {
-//    buttonState = reading;
-//    pressed = 1;
-//  }
-//  lastButtonState = reading;
-//  if (pressed == 1){
-//    return true;
-//  }
-//  else{
-//    return false; 
-//  }
+
+  if ((millis()-lastDebounceTime) > debounceDelay){
+    if (digitalRead(buttonPin) == HIGH) 
+    {
+      lastDebounceTime = millis();
+      return true ;
+    }
+      return false;    
+      }
+    return false;
 }
  
 // waits for all incoming bytes till char c
