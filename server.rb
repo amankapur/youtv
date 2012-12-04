@@ -55,10 +55,9 @@ Thread.new do
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
         while (vid_length == 0) # spin till video length is set by client
-                vid_length = 100
-                puts "vid length now 100"
-        end
 
+        end
+        puts "length is now " + vid_length.to_s
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
 

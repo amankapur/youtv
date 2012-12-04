@@ -2,11 +2,9 @@
 //var state, laststate = null;
 var serverLoop;
 var playerObj = null;
-int length, position;
+var length, position;
 
 $(document).on('ready', function(){
-        postLength();
-        getState();
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
     $('#search').submit(function() {
         $("#yt_vids").html('');
@@ -120,6 +118,7 @@ function postSync() {
 
 //Post video length in seconds
 function postLength() {
+    while(!ytPlayer){}
     length = ytPlayer.getDuration();
     $.ajax({
         type: "POST",
