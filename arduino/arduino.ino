@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#define BUTTON_PIN 3
+#define BUTTON_PIN 12
 #define MOTOR_PIN 13
 
 int motor = MOTOR_PIN;
@@ -10,9 +10,12 @@ char *pos2;
 String message;
 int buttonPin = BUTTON_PIN;
 int vid_length = 0;
+long lastDebounceTime = 0;  // the last time the output pin was toggled
+long debounceDelay = 333;    // the debounce time; increase if the output flickers
 
 void setup()
 {
+  pinMode(buttonPin, INPUT);
   pinMode(motor,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
   //Serial.println("pause 0.12 -");
@@ -39,10 +42,10 @@ void loop()
   // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
-      state == "play";
+      state = "play";
     } 
     else {
-      state == "pause";
+      state = "pause";
     }
   }
 
@@ -98,12 +101,15 @@ boolean userMovedSlider(){
 
 // was button pressed?
 boolean buttonPress(int buttonPin){
-  if (digitalRead(buttonPin) == HIGH) 
-  {
-    return true ;
-  }
-  return false;
-
+  if ((millis()-lastDebounceTime) > debounceDelay){
+    if (digitalRead(buttonPin) == HIGH) 
+    {
+      lastDebounceTime = millis();
+      return true ;
+    }
+      return false;    
+      }
+    return false;
 }
 
 // waits for all incoming bytes till char c
