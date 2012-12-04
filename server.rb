@@ -26,9 +26,9 @@ def sendSync(sp, client_buffer, arduino_buffer)
 	client = getLast(client_buffer)
 	server = getLast(arduino_buffer)
 	
-	client = client.to_i
-	server = server.to_i
-	if server == 0
+	client = client.to_f
+	server = server.to_f
+	if server == 0.0 # save from divide by zero
 		server = 1
 	end
 
@@ -39,17 +39,16 @@ def sendSync(sp, client_buffer, arduino_buffer)
 	end
 end
 
-Thread.new do 
-	
+Thread.new do	
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
-        while vid_length == 0
-                vid_length = '23'
+        while (vid_length == 0)
         end
-        str =  'length ' + vid_length + ' -'
+        str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
+        vid_length = vid_length + 1
 
-	while 1
+       	while 1
 
 		a = ''	
 		b = '1'
@@ -81,7 +80,6 @@ Thread.new do
 
 	end # end while loop
 end
-
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
@@ -108,6 +106,7 @@ end
 post '/sync' do 
 	pos = params[:pos]  #pos is number 0 - 1
 	client_buffer[Time.now.iso8601] = pos
+        server_buffer[Time.now.iso8601] = pos+0.1 #for testing only
 end
 
 options '/*' do 
