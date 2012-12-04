@@ -1,8 +1,17 @@
+// Approximately 6.5 turns for 3328 encoder ticks
+
 #include <stdlib.h>
-#define BUTTON_PIN 12
-#define MOTOR_PIN 13
+#include <Encoder.h>
+
+#define BUTTON_PIN 13
+#define M_PIN_1 10
+#define M_PIN_2 11
+#define M_PIN_3 12
+
+int mPin1 = M_PIN_1;
+int mPin2 = M_PIN_2;
+int mPin3 = M_PIN_3;
  
-int motor = MOTOR_PIN;
 String state = "pause";
 float pos = 0.0;
 char *pos2;
@@ -14,11 +23,22 @@ int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 333;    // the debounce time; increase if the output flickers
+Encoder mEncoder(2, 3);
+int ePos = 0;
+int ePosOld = 0;
+long start;
+long now;
+int firstPlay = 1;
+float vidLen = 10000;
+int ticks = 3328;
+int rightPos = 0;
+int drive = 0;
 
 void setup()
 {
-  pinMode(buttonPin, INPUT);
-  pinMode(motor,OUTPUT);     //initialize analog read pin
+  pinMode(buttonPin, OUTPUT);
+  pinMode(mPin1,OUTPUT);     //initialize analog read pin
+  pinMode(mPin2,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
 
   // spin till we get video length
@@ -29,8 +49,7 @@ void setup()
     Serial.print("length: ");
     Serial.println(vid_length);
   }
- 
-  Serial.println("ack -");  
+  
 }
  
 void loop()
@@ -50,19 +69,27 @@ void loop()
   // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
+      if (firstPlay == 1){
+         start = millis();
+         firstPlay = 0;
+      }
       state = "play";
 
-    }
+      // Serial.println(state);
+    } 
     else {
       state = "pause";
+      // Serial.println(state);
    
     }
   }
  
   // slider position change
   if(userMovedSlider()){
-    int new_pos = getPos(motor);
+    int new_pos = getPos();
   }
+  getPos();
+  motorControl();
  
 }
  
@@ -99,18 +126,65 @@ void handleMessage(String mesg) {
 }
 // Gets position from slider
 // VERY IMPORTANT FUNCTION!!!
- 
-int getPos(int motor){
-  return 0;
-}
+
+int getPos(){
+  ePosOld = ePos;
+  ePos = mEncoder.read();
+  Serial.println(ePos);
+  if (ePos > ticks){
+    state = "reset";
+  }
+  else if (ePos < 0){
+    state = "play";
+    while(ePos < 0){
+      motorControl();
+    }
+    state = "pause";
+  }
+  return ePos;
  
 // checks if slider has been moved by user
 boolean userMovedSlider(){
  
   return false;
 }
- 
- 
+
+void motorControl(){
+  now = millis();
+  ePos = mEncoder.read();
+  rightPos = floor((((now - start)/vidLen)*ticks));
+  if (state == "play"){
+    if (ePos < rightPos){
+//      Serial.println(ePos);
+//      Serial.println(rightPos);
+      drive = 1;
+    }
+    else {
+      drive = 0;
+    }
+    if (drive == 1){
+      digitalWrite(mPin1,LOW);
+      digitalWrite(mPin2,HIGH);
+      digitalWrite(mPin3,HIGH);
+    }
+    else{
+      digitalWrite(mPin1,LOW);
+      digitalWrite(mPin2,LOW);
+      digitalWrite(mPin3,LOW);
+    }
+  }
+  if (state == "reset"){
+    digitalWrite(mPin1,HIGH);
+    digitalWrite(mPin2,LOW);
+    digitalWrite(mPin3,HIGH);
+  }
+  if (state == "pause"){
+    digitalWrite(mPin1,LOW);
+    digitalWrite(mPin2,LOW);
+    digitalWrite(mPin3,LOW);
+  }
+}
+
 // was button pressed?
 boolean buttonPress(int buttonPin){
 
