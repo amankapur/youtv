@@ -3,6 +3,7 @@
 var serverLoop;
 var playerObj = null;
 var length, position;
+var videoLoaded = false;
 
 $(document).on('ready', function(){
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
@@ -52,14 +53,14 @@ function loadPlayer(vid_id) {
     $("videoDiv")
 }
 
-/*function onYouTubePlayerReady(playerid) {
-    console.log('ready'+playerid);
-    if (ytPlayer) ytPlayer.playVideo();
-}*/
+function onYouTubePlayerReady(playerid) {
+    videoLoaded = true;
+}
 
 function closePlayer() {
     window.clearInterval(serverLoop);
     $("#ytPlayer").replaceWith("<div id=\"videoDiv\"></div>")
+    videoLoaded = false;
 }
     
 function toggleFullScreen() {
@@ -118,7 +119,7 @@ function postSync() {
 
 //Post video length in seconds
 function postLength() {
-    while(!ytPlayer){}
+    while(!videoLoaded){}
     length = ytPlayer.getDuration();
     $.ajax({
         type: "POST",
