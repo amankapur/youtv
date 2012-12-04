@@ -2,7 +2,7 @@
 //var state, laststate = null;
 var serverLoop;
 var playerObj = null;
-var length, position;
+var length, position = 0.0;
 
 $(document).on('ready', function(){
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
@@ -47,7 +47,7 @@ function onYouTubePlayerReady(playerid) {
     postLength();
     serverLoop = window.setInterval(function(){
         getState();
-        postSync();
+        //postSync();
         //postLength();
     }, 100);
 }
@@ -81,11 +81,11 @@ function getState() {
         dataType: "json",
         success: function(data){
             console.log(data.pos+','+data.state);
-            lastpos = pos;
-            pos = data.pos;
-            if (Math.abs(pos-lastpos) > 5) {
+            //lastpos = pos;
+            //pos = data.pos;
+            //if (Math.abs(pos-lastpos) > 5) {
                 //The pos has jumped more than expected, tell video to seek 
-            }
+            //}
             vidState = ytPlayer.getPlayerState();
             if (data.state == "play" && vidState != 1 && vidState != 0) {
                 //The video should be playing
@@ -107,7 +107,7 @@ function postSync() {
         type: "POST",
         url: "/sync",
         dataType: "json",
-        data: {"pos" : position}
+        data: {"pos": "0.0"}
     });
 }
 

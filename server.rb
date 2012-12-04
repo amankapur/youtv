@@ -116,8 +116,8 @@ end
 
 post '/sync' do 
 	pos = params[:pos]  #pos is number 0 - 1
+        pos = post.to_f
 	client_buffer[Time.now.iso8601] = pos
-        server_buffer[Time.now.iso8601] = pos+0.1 #for testing only
 end
 
 options '/*' do 
