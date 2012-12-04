@@ -1,4 +1,5 @@
 var pos, lastpos = 0; //These need to be in an object with structure
+var state, laststate = null;
 var serverLoop;
 var playerObj = null;
 
@@ -30,6 +31,7 @@ $(document).on('ready', function(){
     });
 });
 
+//Trying to allow for keyboard control of fullscreen activation (fullscreen needs to be in a user action.)
 window.onkeydown = fullScreenPlayer;
 //window.addEventListener('onkeydown', function (keyEvent) {
 function fullScreenPlayer(keyEvent) {
@@ -76,8 +78,13 @@ function getState() {
             //console.log(data);
             lastpos = pos;
             pos = data.pos;
+            laststate = state;
+            state = data.state;
             if (Math.abs(pos-lastpos) > 5) {
                 //The pos has jumped more than expected, tell video to seek 
+            }
+            if (state != laststate) {
+                //The state has changed and we should control the player
             }
         }
     });
