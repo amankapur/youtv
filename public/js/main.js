@@ -19,7 +19,7 @@ $(document).on('ready', function(){
                 var temp = entry.find("content")[1];
                 var vid_url = temp.getAttribute('url');
                 var title = entry.find('title').text();
-                var html = '<div class="row"> <a href=' + vid_url + '><img src = ' + thumbnail_url + '></a> <h2>'+ title+' </h2> </div>';
+                var html = '<div class="row"><a href="#"><img src = ' + thumbnail_url + ' onClick="loadPlayer(\'' + vid_url + '\')"></a> <h2>'+ title + ' </h2> </div>';
                 $("#yt_vids").append(html);
             }
         });
@@ -32,13 +32,17 @@ $(document).on('ready', function(){
     }, 100);
 });
 
+function loadPlayer(video) {
+    console.log(video);
+}
+
 function getState() {
     $.ajax({
         type: "GET",
         url: "/state",
         dataType: "json",
         success: function(data){
-            console.log("Did that just work?");
+            console.log(data);
             lastpos = pos;
             pos = data.pos;
             if (Math.abs(pos-lastpos) > 5) {
@@ -53,14 +57,7 @@ function postSync() {
         type: "POST",
         url: "/sync",
         dataType: "json",
-        success: function(data){
-            console.log("Did that just work?");
-            lastpos = pos;
-            //pos = data.pos;
-            if (Math.abs(pos-lastpos) > 5) {
-                //The pos has jumped more than expected, tell video to seek 
-            }
-        }
+        data: {"pos" : 0}
     });
 }
 
