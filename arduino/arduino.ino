@@ -11,12 +11,16 @@
 int mPin1 = M_PIN_1;
 int mPin2 = M_PIN_2;
 int mPin3 = M_PIN_3;
+ 
 String state = "pause";
 float pos = 0.0;
 char *pos2;
-String message;
+String message = " ";
 int buttonPin = BUTTON_PIN;
 int vid_length = 0;
+int pressed = 0;
+int buttonState;             // the current reading from the input pin
+int lastButtonState = LOW;   // the previous reading from the input pin
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 333;    // the debounce time; increase if the output flickers
 Encoder mEncoder(2, 3);
@@ -37,26 +41,36 @@ void setup()
   pinMode(mPin2,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
   //Serial.println("pause 0.12 -");
-  
 //  message = chkSer('-');
   //Serial.println(message);
   //while(vid_length == 0){handleMessage(message);Serial.print('length: '); Serial.println(vid_length);}
   //Serial.println("exit");
+  // spin till we get video length
+  while(vid_length == 0){
+    message = chkSer('-');
+    Serial.println("message is " + message);
+    handleMessage(message);
+    Serial.print("length: ");
+    Serial.println(vid_length);
+  }
+  
+  // Serial.println("exit");
 }
-
+ 
 void loop()
 {
-//  Serial.println("WTF");
   // send state and pos to server
-  //  dtostrf (pos, '4', '2', pos2);
-  //  Serial.println(state + ' ' + pos2 + " -");
-
+  //  dtostrf (pos, '4', '2', pos2);  
+  Serial.print(state + ' ' );
+  Serial.print(pos2 );
+  Serial.println(" -");
+ 
   // incoming message from server
-  //  if (Serial.available() >0){
-//  message = "Synch 0.21 -"; 
-//  handleMessage(message);
-  //}
-
+    if (Serial.available() >0){
+      message = chkSer('-');
+      handleMessage(message);
+  }
+ 
   // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
@@ -65,22 +79,28 @@ void loop()
          firstPlay = 0;
       }
       state = "play";
-      Serial.println(state);
+      // Serial.println(state);
     } 
     else {
       state = "pause";
-      Serial.println(state);
+      // Serial.println(state);
+      //Serial.println("state changed to : " + state);
+    }
+    else {
+      state = "pause";
+      //Serial.println("state changed to : " + state);
     }
   }
-
+ 
   // slider position change
   if(userMovedSlider()){
     int new_pos = getPos();
   }
   getPos();
   motorControl();
+ 
 }
-
+ 
 // get position from mesg in string and float
 // this is JANKETY but it works for now
 void handleMessage(String mesg) {
@@ -100,14 +120,16 @@ void handleMessage(String mesg) {
 //    Serial.println(pos);
 //    Serial.println(pos2);
   }
-  
+ 
   if(mesg.indexOf('g') > 0){
     for (i = 0; i < mesg.length(); i++){
-      msg[i] = mesg[i];
+       msg[i] = mesg[i];
+    }
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
+     Serial.print("pch is ");
      vid_length = atoi(pch);
-    }
+    
   }
 }
 // Gets position from slider
@@ -128,12 +150,11 @@ int getPos(){
     state = "pause";
   }
   return ePos;
-}
-
+ 
 // checks if slider has been moved by user
 boolean userMovedSlider(){
-
-  return false; 
+ 
+  return false;
 }
 
 void motorControl(){
@@ -174,6 +195,7 @@ void motorControl(){
 
 // was button pressed?
 boolean buttonPress(int buttonPin){
+
   if ((millis()-lastDebounceTime) > debounceDelay){
     if (digitalRead(buttonPin) == HIGH) 
     {
@@ -184,7 +206,7 @@ boolean buttonPress(int buttonPin){
       }
     return false;
 }
-
+ 
 // waits for all incoming bytes till char c
 // return string of data recevied
 String chkSer(char c){
@@ -195,13 +217,11 @@ String chkSer(char c){
     if(Serial.available() >0){
       character = Serial.read();
       content.concat(character);
-      //Serial.println(content);
-
+     
     }
   }
+  Serial.print("content is : ");
+  Serial.println(content);
+ 
   return content;
 }
-
-
-
-
