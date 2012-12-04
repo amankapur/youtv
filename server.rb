@@ -40,29 +40,33 @@ def sendSync(sp, client_buffer, arduino_buffer)
 	end
 end
 
-Thread.new do
+def getMessage(sp)
+ 	a = ''	
+	b = '1'
+	while (b != '-') # keep reading till end char '-'
+		b = sp.getc
+		if (b!=nil)
+			a += b
+		end
+	end
+	return a       
+end
+
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
-        while (vid_length == 10)
+        while (vid_length == 0) # spin till video length is set by client
+                vid_length = 100
+                puts "vid length now 100"
         end
-        vid_length = 100
+
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
 
        	while 1
-
-		a = ''	
-		b = '1'
-		while (b != '-') # keep reading till end char '-'
-			b = sp.getc
-			if (b!=nil)
-				a += b
-			end
-		end
-		# 'a' is the string read from arduino
-
-		if a.include?('pause')
-			state = 'pause'
+                a = getMessage(sp)
+                puts "a: " + a.to_s	
+                if a.include?('pause')
+                state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
@@ -80,7 +84,7 @@ Thread.new do
 		sendSync(sp, client_buffer, arduino_buffer)
 
 	end # end while loop
-end
+
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals

@@ -20,8 +20,7 @@ void setup()
   pinMode(buttonPin, INPUT);
   pinMode(motor,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
-  //Serial.println("pause 0.12 -");
-  
+
   // spin till we get video length
   while(vid_length == 0){
     message = chkSer('-');
@@ -30,7 +29,8 @@ void setup()
     Serial.print("length: ");
     Serial.println(vid_length);
   }
-  
+ 
+  Serial.println("ack -");  
 }
  
 void loop()
@@ -126,7 +126,7 @@ boolean buttonPress(int buttonPin){
 }
  
 // waits for all incoming bytes till char c
-// return string of data recevied
+// return string of data recevied22
 String chkSer(char c){
   String content = "";
   char character;
@@ -138,8 +138,8 @@ String chkSer(char c){
      
     }
   }
-  Serial.print("content is : ");
-  Serial.println(content);
+  //Serial.print("content is : ");
+  //Serial.println(content);
  
   return content;
 }
