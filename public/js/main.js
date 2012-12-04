@@ -26,8 +26,8 @@ $(document).on('ready', function(){
     return false;
     });
     window.setInterval(function(){
-        getState();
-        postSync();
+        //getState();
+        //postSync();
         postLength();
     }, 100);
 });
