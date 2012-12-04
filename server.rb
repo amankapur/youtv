@@ -33,20 +33,21 @@ def sendSync(sp, client_buffer, arduino_buffer)
 	end
 
 	if ((server-client).abs/server * 100) < 2
-		sp.write('sync ' + getLast(client_buffer).to_s() + ' -')
+		str = 'sync ' + getLast(client_buffer).to_s() + ' -'
+                sp.write(str)
 	else
 		sp.write("null -")
 	end
 end
 
-Thread.new do	
+Thread.new do
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
-        while (vid_length == 0)
+        while (vid_length == 10)
         end
+        vid_length = 100
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
-        vid_length = vid_length + 1
 
        	while 1
 

@@ -9,7 +9,6 @@ char *pos2;
 String message = " ";
 int buttonPin = BUTTON_PIN;
 int vid_length = 0;
-<<<<<<< HEAD
 int pressed = 0;
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
@@ -32,33 +31,31 @@ void setup()
     Serial.println(vid_length);
   }
   
-  Serial.println("exit");
 }
  
 void loop()
 {
-  //Serial.println("WTF");
-  // send state and pos to server
-  //  dtostrf (pos, '4', '2', pos2);  
+    
   Serial.print(state + ' ' );
-  Serial.print(pos2 );
+  Serial.print(0.4);
   Serial.println(" -");
+  
  
   // incoming message from server
-    if (Serial.available() >0){
+  if (Serial.available()){
       message = chkSer('-');
       handleMessage(message);
-  }
- 
+    }
+  
   // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
       state = "play";
-      //Serial.println("state changed to : " + state);
+
     }
     else {
       state = "pause";
-      //Serial.println("state changed to : " + state);
+   
     }
   }
  
