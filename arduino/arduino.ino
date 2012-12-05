@@ -24,7 +24,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-float vidLen = 0.0;
+float vidLen = 30000;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -34,7 +34,6 @@ int gBool[6][6] = {{1,1,1,1,1,1},{1,1,1,1,1,1},{0,1,1,1,1,0},{0,0,1,1,0,0},{0,0,
 int i;
 int j;
 int k;
-long count = 0;
 
 void setup()
 {
@@ -60,14 +59,14 @@ void setup()
  
 void loop(){
   pos = getPos()/3328.0;
-  Serial.print("POS IS : ");
-  Serial.println(pos);
+//  Serial.print("POS IS : ");
+//  Serial.println(pos);
   motorControl();
   
-  Serial.print(" ");
-  Serial.print(state + ' ' );
-  Serial.print(pos);
-  Serial.println(" -");
+//  Serial.print(" ");
+//  Serial.print(state + ' ' );
+//  Serial.print(pos);
+//  Serial.println(" -");
  
   // incoming message from server
   if (Serial.available()) {
@@ -169,6 +168,7 @@ void motorControl(){
   now = millis();
   ePos = mEncoder.read();
   rightPos = floor((((now - start)/vidLen)*ticks));
+  Serial.println(ePos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
@@ -179,24 +179,28 @@ void motorControl(){
       drive = 0;
     }
     if (drive == 1){
-      digitalWrite(mPin1,LOW);
-      digitalWrite(mPin2,HIGH);
+//      Serial.println("Driving");
+      analogWrite(mPin1,0);
+      analogWrite(mPin2,255);
       digitalWrite(mPin3,HIGH);
     }
     else{
-      digitalWrite(mPin1,LOW);
-      digitalWrite(mPin2,LOW);
+//      Serial.println("Not driving but playing");
+      analogWrite(mPin1,0);
+      analogWrite(mPin2,150);
       digitalWrite(mPin3,LOW);
     }
   }
   if (state == "reset"){
-    digitalWrite(mPin1,HIGH);
-    digitalWrite(mPin2,LOW);
+//    Serial.println("Reseting");
+    analogWrite(mPin1,255);
+    analogWrite(mPin2,0);
     digitalWrite(mPin3,HIGH);
   }
   if (state == "pause"){
-    digitalWrite(mPin1,LOW);
-    digitalWrite(mPin2,LOW);
+//    Serial.println("Pausing");
+    analogWrite(mPin1,25);
+    analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);
   }
 }
@@ -232,19 +236,13 @@ String chkSer(char c){
 }
 
 void pauseMatrix(){
-  if (count % 2 == 0){
-    for (i = 0; i < 6; i++){
-      digitalWrite(gnds[i],LOW);
-    }
-    digitalWrite(A0,HIGH);
-    digitalWrite(A1,HIGH);
-    digitalWrite(A4,HIGH);
-    digitalWrite(A5,HIGH);
+  for (i = 0; i < 6; i++){
+    digitalWrite(gnds[i],LOW);
   }
-  else {
-    clearPins();
-  }
-  count++;
+  digitalWrite(A0,HIGH);
+  digitalWrite(A1,HIGH);
+  digitalWrite(A4,HIGH);
+  digitalWrite(A5,HIGH);
 }
 
 void playMatrix(){
