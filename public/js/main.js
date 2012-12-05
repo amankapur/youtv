@@ -96,7 +96,8 @@ function getState() {
                 ytPlayer.pauseVideo();
             }
 	    else if (data.state == "motion") {
-		ytPlayer.seekTo(data.pos * ytPlayer.getDuration(), true);	
+                    var dur = data.pos * ytPlayer.getDuration();
+		ytPlayer.seekTo(dur, true);	
 	    }
         }
     });

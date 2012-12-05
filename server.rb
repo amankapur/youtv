@@ -78,12 +78,20 @@ Thread.new do
 			pos = a[/\d+(?:\.\d+)?/]
                         puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
-                        pos = pos.to_f 
+                        pos = pos.to_f/3328.0
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
 			end
 		end
-	
+                
+                if a.include?('motion')
+                        state = 'motion'
+	        	pos = a[/\d+(?:\.\d+)?/]
+                        puts "a: " + a.to_s
+                        puts "pos is : " + pos.to_s
+                        pos = pos.to_f/3328.0
+	        end
+
 		sendSync(sp, client_buffer, arduino_buffer)
 	end # end while loop
 end
