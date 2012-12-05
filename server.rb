@@ -100,6 +100,11 @@ configure do
   enable :cross_origin
 end
 
+options '/*' do 
+	response["Access-Control-Allow-Headers"] = "origin, x-requested-with, content-type"
+end
+
+
 get '/' do 
 	herb :index
 end
@@ -113,13 +118,9 @@ post '/length' do
         vid_length = params[:len] 
 end
 
-post '/sync' do 
+post '/position' do
+	 
 	pos = params[:pos]  #pos is number 0 - 1
-        pos = post.to_f
 	client_buffer[Time.now.iso8601] = pos
-end
-
-options '/*' do 
-	response["Access-Control-Allow-Headers"] = "origin, x-requested-with, content-type"
 end
 

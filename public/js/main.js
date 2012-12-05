@@ -48,7 +48,7 @@ function onYouTubePlayerReady(playerid) {
     console.log("length posted");
     serverLoop = window.setInterval(function(){
         getState();
-        //postSync();
+        postSync();
         //postLength();
     }, 100);
 }
@@ -100,15 +100,24 @@ function getState() {
 }
 
 function postSync() {
+    
+    position = 0.0;
+    //console.log("length : " + length.toString());
     if (length) {
         position = ytPlayer.getCurrentTime()/length;
+
     }
-    else position = ytPlayer.getCurrentTime()/ytPlayer.getDuration();
+    else {position = ytPlayer.getCurrentTime()/ytPlayer.getDuration();}
+    position = position.toString();
+    
     $.ajax({
         type: "POST",
-        url: "/sync",
+        url: "/position",
         dataType: "json",
-        data: {"pos": "0.0"}
+        data: {"pos":position},
+        success: function(){
+                //console.log("post pos successful");
+        } 
     });
 }
 
@@ -119,7 +128,10 @@ function postLength() {
         type: "POST",
         url: "/length",
         dataType: "json",
-        data: {"len":length}
+        data: {"len":length},
+        success: function(){
+        //        console.log("post length successful");
+        } 
     });
 }
 
