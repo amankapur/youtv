@@ -29,7 +29,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-float vidLen = 10000;
+int vidLen = 0;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -42,7 +42,7 @@ void setup()
   Serial.begin(9600);          //Open serial communication
 
   // spin till we get video length
-  while(vid_length == 0){
+  while(vidLen == 0){
     message = chkSer('-');
     //Serial.println("message is " + message);
     handleMessage(message);
@@ -89,7 +89,7 @@ void loop()
   if(userMovedSlider()){
     int new_pos = getPos();
   }
-  pos = getPos();
+  pos = getPos()/3328.0;
   motorControl();
  
 }
@@ -121,7 +121,7 @@ void handleMessage(String mesg) {
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
      //Serial.print("pch is ");
-     vid_length = atoi(pch);
+     vidLen = atoi(pch) * 1000;
     
   }
 }

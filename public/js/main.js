@@ -45,6 +45,7 @@ function loadPlayer(vid_id) {
 
 function onYouTubePlayerReady(playerid) {
     postLength();
+    console.log("length posted");
     serverLoop = window.setInterval(function(){
         getState();
         //postSync();
@@ -87,9 +88,9 @@ function getState() {
                 //The pos has jumped more than expected, tell video to seek 
             //}
             vidState = ytPlayer.getPlayerState();
-            if (data.state == "play" && vidState != 1 && vidState != 0) {
+            if (data.state == "sync" && vidState != 1 && vidState != 0) {
                 //The video should be playing
-                if (state == "play") ytPlayer.playVideo();
+                ytPlayer.playVideo();
             }
             else if (data.state == "pause" && vidState != 2) {
                 ytPlayer.pauseVideo();

@@ -32,12 +32,12 @@ def sendSync(sp, client_buffer, arduino_buffer)
 		server = 1
 	end
 
-	if ((server-client).abs/server * 100) < 2
-		str = 'sync ' + getLast(client_buffer).to_s() + ' -'
-                sp.write(str)
-	else
-		sp.write("null -")
-	end
+##	if ((server-client).abs/server * 100) < 2
+#		str = 'sync ' + getLast(client_buffer).to_s() + ' -'
+ #               sp.write(str)
+#	else
+#		sp.write("null -")
+#	end
 end
 
 def getMessage(sp)
@@ -55,7 +55,6 @@ Thread.new do
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
         while (vid_length == 0) # spin till video length is set by client
-
         end
         puts "length is now " + vid_length.to_s
         str =  'length ' + vid_length.to_s + ' -'
