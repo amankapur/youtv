@@ -24,7 +24,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-float vidLen = 30000;
+long vidLen = 0;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -60,15 +60,19 @@ void setup()
 }
  
 void loop(){
+  
+  Serial.print("vidlen is set to : ");
+     Serial.println(vidLen);
+    
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
 //  Serial.println(pos);
   motorControl();
   
-  Serial.print(" ");
-  Serial.print(state + ' ' );
-  Serial.print(pos);
-  Serial.println(" -");
+  //Serial.print(" ");
+  //Serial.print(state + ' ' );
+  //Serial.print(pos);
+  //Serial.println(" -");
  
   // incoming message from server
   if (Serial.available()) {
@@ -117,11 +121,12 @@ void loop(){
 // get position from mesg in string and float
 // this is JANKETY but it works for now
 void handleMessage(String mesg) {
+
   int i;
   char *pch;
   char msg[15];
 //  Serial.println(mesg);
-  if (mesg.indexOf("l") > 0) return; //life is good, don't do anything
+  if (mesg.indexOf("u") > 0) return; //life is good, don't do anything
   if (mesg.indexOf("y") >0) {
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
@@ -130,16 +135,20 @@ void handleMessage(String mesg) {
     pch = strtok (NULL, " ");
     pos2 = pch;
     pos = atof(pos2);
+    return;
 
   }
-  if(mesg.indexOf('g') > 0){
+
+
+  if(mesg.indexOf("g") > 0){
+
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
     }
+ 
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
-     vidLen = atoi(pch) * 1000;
-    
+     vidLen = atol(pch) * 1000;
   }
   
 }
@@ -177,7 +186,7 @@ void motorControl(){
   now = millis();
   ePos = mEncoder.read();
   rightPos = floor((((now - start)/vidLen)*ticks));
-  Serial.println(ePos);
+  //Serial.println(ePos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
