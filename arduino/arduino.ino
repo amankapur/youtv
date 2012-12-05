@@ -52,16 +52,14 @@ void setup()
   
 }
  
-void loop()
-{
+void loop(){
   Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
-  
  
   // incoming message from server
-  if (Serial.available()){
+  if (Serial.available()) {
       message = chkSer('-');
       handleMessage(message);
       
