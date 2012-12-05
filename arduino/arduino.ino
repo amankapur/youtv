@@ -29,7 +29,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-float vidLen = 10000;
+int vidLen = 0;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -40,37 +40,32 @@ void setup()
   pinMode(mPin1,OUTPUT);     //initialize analog read pin
   pinMode(mPin2,OUTPUT);     //initialize analog read pin
   Serial.begin(9600);          //Open serial communication
-  //Serial.println("pause 0.12 -");
-//  message = chkSer('-');
-  //Serial.println(message);
-  //while(vid_length == 0){handleMessage(message);Serial.print('length: '); Serial.println(vid_length);}
-  //Serial.println("exit");
-  // spin till we get video length
-//  while(vid_length == 0){
-//    message = chkSer('-');
-//    Serial.println("message is " + message);
-//    handleMessage(message);
-//    Serial.print("length: ");
-//    Serial.println(vid_length);
-//  }
+
+  // spin till we get video length\
+  while(vidLen == 0){
+    message = chkSer('-');
+    //Serial.println("message is " + message);
+    handleMessage(message);
+    //Serial.print("length: ");
+    //Serial.println(vid_length);
+  }
   
-  // Serial.println("exit");
 }
  
 void loop()
 {
-  // send state and pos to server
-  //  dtostrf (pos, '4', '2', pos2);  
-//  Serial.print(state + ' ' );
-//  Serial.print(pos2 );
-//  Serial.println(" -");
+  Serial.print(" ");
+  Serial.print(state + ' ' );
+  Serial.print(pos);
+  Serial.println(" -");
+  
  
   // incoming message from server
-//    if (Serial.available() >0){
-//      message = chkSer('-');
-//      handleMessage(message);
-//  }
- 
+  if (Serial.available()){
+      message = chkSer('-');
+      handleMessage(message);
+      
+    }
   // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
@@ -79,11 +74,11 @@ void loop()
          firstPlay = 0;
       }
       state = "play";
+
       // Serial.println(state);
     } 
     else {
       state = "pause";
-      //Serial.println("state changed to : " + state);
     }
   }
  
@@ -91,7 +86,7 @@ void loop()
   if(userMovedSlider()){
     int new_pos = getPos();
   }
-  getPos();
+  pos = getPos()/3328.0;
   motorControl();
 }
  
@@ -102,8 +97,8 @@ void handleMessage(String mesg) {
   char *pch;
   char msg[15];
 //  Serial.println(mesg);
-  if (mesg.indexOf("l") > 0) return; //life is good, don't do anything
-  if (mesg.indexOf("y") >0) {
+  if (mesg.indexOf('u') > 0) return; //life is good, don't do anything
+  if (mesg.indexOf('s') >0) {
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
     }
@@ -121,8 +116,8 @@ void handleMessage(String mesg) {
     }
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
-     Serial.print("pch is ");
-     vid_length = atoi(pch);
+     //Serial.print("pch is ");
+     vidLen = atoi(pch) * 1000;
     
   }
 }
@@ -132,8 +127,6 @@ void handleMessage(String mesg) {
 int getPos(){
   ePosOld = ePos;
   ePos = mEncoder.read();
-//  Serial.println("Position is");
-//  Serial.println(ePos);
   if (ePos > ticks){
     state = "reset";
   }
@@ -211,7 +204,7 @@ boolean buttonPress(int buttonPin){
 }
  
 // waits for all incoming bytes till char c
-// return string of data recevied
+// return string of data recevied22
 String chkSer(char c){
   String content = "";
   char character;
@@ -223,8 +216,8 @@ String chkSer(char c){
      
     }
   }
-  Serial.print("content is : ");
-  Serial.println(content);
+  //Serial.print("content is : ");
+  //Serial.println(content);
  
   return content;
 }

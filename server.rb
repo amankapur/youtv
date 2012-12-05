@@ -32,45 +32,55 @@ def sendSync(sp, client_buffer, arduino_buffer)
 		server = 1
 	end
 
-	if ((server-client).abs/server * 100) < 2
-		sp.write('sync ' + getLast(client_buffer).to_s() + ' -')
-	else
-		sp.write("null -")
-	end
+##	if ((server-client).abs/server * 100) < 2
+#		str = 'sync ' + getLast(client_buffer).to_s() + ' -'
+ #               sp.write(str)
+#	else
+#		sp.write("null -")
+#	end
 end
 
-Thread.new do	
+def getMessage(sp)
+ 	a = ''	
+	b = '1'
+	while (b != '-') # keep reading till end char '-'
+		b = sp.getc
+		if (b!=nil)
+			a += b
+		end
+	end
+	return a       
+end
+Thread.new do
 	sp = SerialPort.new "/dev/ttyACM0", 9600
         
-        while (vid_length == 0)
+        while (vid_length == 0) # spin till video length is set by client
         end
+        puts "length is now " + vid_length.to_s
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
-        vid_length = vid_length + 1
 
        	while 1
+                a = getMessage(sp)
 
-		a = ''	
-		b = '1'
-		while (b != '-') # keep reading till end char '-'
-			b = sp.getc
-			if (b!=nil)
-				a += b
-			end
-		end
-		# 'a' is the string read from arduino
-
-		if a.include?('pause')
-			state = 'pause'
+                if a.include?('pause')
+                state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
+                        
+                        puts "a: " + a.to_s
+                        puts "pos is : " + pos.to_s
+                        pos = pos.to_f
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
 			end
 		end
-
+                
 		if a.include?('play')
 			state = 'sync'
 			pos = a[/\d+(?:\.\d+)?/]
+                        puts "a: " + a.to_s
+                        puts "pos is : " + pos.to_s
+                        pos = pos.to_f 
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
 			end
@@ -90,6 +100,11 @@ configure do
   enable :cross_origin
 end
 
+options '/*' do 
+	response["Access-Control-Allow-Headers"] = "origin, x-requested-with, content-type"
+end
+
+
 get '/' do 
 	herb :index
 end
@@ -103,13 +118,9 @@ post '/length' do
         vid_length = params[:len] 
 end
 
-post '/sync' do 
+post '/position' do
+	 
 	pos = params[:pos]  #pos is number 0 - 1
 	client_buffer[Time.now.iso8601] = pos
-        server_buffer[Time.now.iso8601] = pos+0.1 #for testing only
-end
-
-options '/*' do 
-	response["Access-Control-Allow-Headers"] = "origin, x-requested-with, content-type"
 end
 
