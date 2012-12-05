@@ -46,13 +46,13 @@ void setup()
   //while(vid_length == 0){handleMessage(message);Serial.print('length: '); Serial.println(vid_length);}
   //Serial.println("exit");
   // spin till we get video length
-  while(vid_length == 0){
-    message = chkSer('-');
-    Serial.println("message is " + message);
-    handleMessage(message);
-    Serial.print("length: ");
-    Serial.println(vid_length);
-  }
+//  while(vid_length == 0){
+//    message = chkSer('-');
+//    Serial.println("message is " + message);
+//    handleMessage(message);
+//    Serial.print("length: ");
+//    Serial.println(vid_length);
+//  }
   
   // Serial.println("exit");
 }
@@ -61,15 +61,15 @@ void loop()
 {
   // send state and pos to server
   //  dtostrf (pos, '4', '2', pos2);  
-  Serial.print(state + ' ' );
-  Serial.print(pos2 );
-  Serial.println(" -");
+//  Serial.print(state + ' ' );
+//  Serial.print(pos2 );
+//  Serial.println(" -");
  
   // incoming message from server
-    if (Serial.available() >0){
-      message = chkSer('-');
-      handleMessage(message);
-  }
+//    if (Serial.available() >0){
+//      message = chkSer('-');
+//      handleMessage(message);
+//  }
  
   // play/pause button press
   if (buttonPress(buttonPin)) {
@@ -83,11 +83,6 @@ void loop()
     } 
     else {
       state = "pause";
-      // Serial.println(state);
-      //Serial.println("state changed to : " + state);
-    }
-    else {
-      state = "pause";
       //Serial.println("state changed to : " + state);
     }
   }
@@ -98,7 +93,6 @@ void loop()
   }
   getPos();
   motorControl();
- 
 }
  
 // get position from mesg in string and float
@@ -138,7 +132,8 @@ void handleMessage(String mesg) {
 int getPos(){
   ePosOld = ePos;
   ePos = mEncoder.read();
-  Serial.println(ePos);
+//  Serial.println("Position is");
+//  Serial.println(ePos);
   if (ePos > ticks){
     state = "reset";
   }
@@ -150,7 +145,8 @@ int getPos(){
     state = "pause";
   }
   return ePos;
- 
+}
+
 // checks if slider has been moved by user
 boolean userMovedSlider(){
  
@@ -161,6 +157,8 @@ void motorControl(){
   now = millis();
   ePos = mEncoder.read();
   rightPos = floor((((now - start)/vidLen)*ticks));
+//  Serial.println(state);
+//  Serial.println(rightPos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
@@ -170,26 +168,31 @@ void motorControl(){
     else {
       drive = 0;
     }
+    Serial.println(drive);
     if (drive == 1){
       digitalWrite(mPin1,LOW);
       digitalWrite(mPin2,HIGH);
       digitalWrite(mPin3,HIGH);
+      Serial.println("Driving play");
     }
     else{
       digitalWrite(mPin1,LOW);
       digitalWrite(mPin2,LOW);
       digitalWrite(mPin3,LOW);
+      Serial.println("Not driving play");
     }
   }
   if (state == "reset"){
     digitalWrite(mPin1,HIGH);
     digitalWrite(mPin2,LOW);
     digitalWrite(mPin3,HIGH);
+    Serial.println("Resetting");
   }
   if (state == "pause"){
     digitalWrite(mPin1,LOW);
     digitalWrite(mPin2,LOW);
     digitalWrite(mPin3,LOW);
+    Serial.println("Pause");
   }
 }
 
