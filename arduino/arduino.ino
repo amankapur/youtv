@@ -24,7 +24,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-long vidLen = 0;
+long vidLen = 11000;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -35,6 +35,7 @@ int i;
 int j;
 int k;
 int reset = 0;
+float tempPos = 0;
 String prev_state;
 
 void setup()
@@ -61,8 +62,9 @@ void setup()
  
 void loop(){
   
-  //Serial.print("vidlen is set to : ");
-  //   Serial.println(vidLen);
+//  Serial.print("vidlen is set to : ");
+//     Serial.println(vidLen);
+
     
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
@@ -73,7 +75,7 @@ void loop(){
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
- 
+
   // incoming message from server
   if (Serial.available()) {
       message = chkSer('-');
@@ -163,12 +165,12 @@ int getPos(){
     reset = 1;
   }
   else if (ePos < 0){
+    reset = 0;
     state = "play";
     while(ePos < 0){
       motorControl();
     }
     state = "pause";
-    reset = 0;
   }
   return ePos;
 }
@@ -185,8 +187,9 @@ boolean userMovedSlider(){
 void motorControl(){
   now = millis();
   ePos = mEncoder.read();
-  rightPos = floor((((now - start)/vidLen)*ticks));
-  //Serial.println(ePos);
+  rightPos = floor((((now - start)/(float)vidLen)*ticks));
+//  Serial.println(ePos);
+  Serial.println(rightPos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
@@ -197,26 +200,26 @@ void motorControl(){
       drive = 0;
     }
     if (drive == 1){
-//      Serial.println("Driving");
+      Serial.println("Driving");
       analogWrite(mPin1,0);
       analogWrite(mPin2,255);
       digitalWrite(mPin3,HIGH);
     }
     else{
-//      Serial.println("Not driving but playing");
+      Serial.println("Not driving but playing");
       analogWrite(mPin1,0);
       analogWrite(mPin2,150);
       digitalWrite(mPin3,LOW);
     }
   }
   if (reset == 1){
-//    Serial.println("Reseting");
+    Serial.println("Reseting");
     analogWrite(mPin1,255);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,HIGH);
   }
   if (state == "pause"){
-//    Serial.println("Pausing");
+    Serial.println("Pausing");
     analogWrite(mPin1,25);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);
