@@ -6,7 +6,7 @@ require 'serialport'
 require 'thread'
 require 'time'
 
-state = 'sync'
+state = 'pause'
 
 vid_length = 0
 arduino_buffer = {}
@@ -32,13 +32,10 @@ def sendSync(sp, client_buffer, arduino_buffer)
 		server = 1
 	end
 
-##	if ((server-client).abs/server * 100) < 2
-#		str = 'sync ' + getLast(client_buffer).to_s() + ' -'
- #               sp.write(str)
-#	else
-#		sp.write("null -")
-#	end
+        sp.write("null -")
+
 end
+
 
 def getMessage(sp)
  	a = ''	
@@ -56,6 +53,7 @@ Thread.new do
         
         while (vid_length == 0) # spin till video length is set by client
         end
+        
         puts "length is now " + vid_length.to_s
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
@@ -66,8 +64,8 @@ Thread.new do
                 if a.include?('pause')
                 state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
-                        
-                        puts "a: " + a.to_s
+                        pos = pos.to_f/3328.0 
+                        #puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
                         pos = pos.to_f
 			if pos != nil
@@ -87,14 +85,13 @@ Thread.new do
 		end
 	
 		sendSync(sp, client_buffer, arduino_buffer)
-
 	end # end while loop
 end
+
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
 end
-
 
 configure do
   enable :cross_origin
@@ -120,7 +117,8 @@ end
 
 post '/position' do
 	 
-	pos = params[:pos]  #pos is number 0 - 1
-	client_buffer[Time.now.iso8601] = pos
+	cli_pos = params[:pos]  #pos is number 0 - 1
+        cli_pos = cli_pos.to_f
+	client_buffer[Time.now.iso8601] = cli_pos
 end
 

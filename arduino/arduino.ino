@@ -16,7 +16,6 @@ float pos = 0.0;
 char *pos2;
 String message;
 int buttonPin = BUTTON_PIN;
-int vid_length = 0;
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 333;    // the debounce time; increase if the output flickers
 Encoder mEncoder(2, 3);
@@ -25,7 +24,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-float vidLen = 100000;
+float vidLen = 0.0;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -50,14 +49,21 @@ void setup()
     pinMode(gnds[i],OUTPUT);
   }
   
-  while(vid_length == 0){
+  
+  while(vidLen == 0){
+     //Serial.println("WtTF");
      message = chkSer('-');
      handleMessage(message);
    }
-
-  }
+  
+}
  
 void loop(){
+  pos = getPos()/3328.0;
+  Serial.print("POS IS : ");
+  Serial.println(pos);
+  motorControl();
+  
   Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
@@ -66,6 +72,7 @@ void loop(){
   // incoming message from server
   if (Serial.available()) {
       message = chkSer('-');
+      //Serial.println("message is : " + message);
       handleMessage(message);
       
     }
@@ -77,20 +84,19 @@ void loop(){
          firstPlay = 0;
       }
       state = "play";
-      Serial.println(state);
+      //Serial.println(state);
     } 
     else {
       state = "pause";
-      Serial.println(state);
+      //Serial.println(state);
     }
   }
 
   // slider position change
   if(userMovedSlider()){
-    int new_pos = getPos();
+    //int new_pos = getPos();
   }
-  getPos();
-  motorControl();
+  
   if (state == "play"){
     playMatrix();  
   }
@@ -100,6 +106,8 @@ void loop(){
   if (state == "reset"){
     pauseMatrix();
   }
+  
+  
 }
 
 // get position from mesg in string and float
@@ -118,18 +126,18 @@ void handleMessage(String mesg) {
     pch = strtok (NULL, " ");
     pos2 = pch;
     pos = atof(pos2);
-//    Serial.println(pos);
-//    Serial.println(pos2);
+
   }
-  
   if(mesg.indexOf('g') > 0){
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
+    }
      pch = strtok (msg," ");
      pch = strtok (NULL, " ");
-     vid_length = atoi(pch);
-    }
+     vidLen = atoi(pch) * 1000;
+    
   }
+  
 }
 // Gets position from slider
 // VERY IMPORTANT FUNCTION!!!
@@ -137,7 +145,7 @@ void handleMessage(String mesg) {
 int getPos(){
   ePosOld = ePos;
   ePos = mEncoder.read();
-  Serial.println(ePos);
+  //Serial.println(ePos);
   if (ePos > ticks){
     state = "reset";
   }
