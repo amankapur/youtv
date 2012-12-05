@@ -61,18 +61,18 @@ void setup()
  
 void loop(){
   
-  Serial.print("vidlen is set to : ");
-     Serial.println(vidLen);
+  //Serial.print("vidlen is set to : ");
+  //   Serial.println(vidLen);
     
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
 //  Serial.println(pos);
   motorControl();
   
-  //Serial.print(" ");
-  //Serial.print(state + ' ' );
-  //Serial.print(pos);
-  //Serial.println(" -");
+  Serial.print(" ");
+  Serial.print(state + ' ' );
+  Serial.print(pos);
+  Serial.println(" -");
  
   // incoming message from server
   if (Serial.available()) {
