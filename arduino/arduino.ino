@@ -34,6 +34,7 @@ int gBool[6][6] = {{1,1,1,1,1,1},{1,1,1,1,1,1},{0,1,1,1,1,0},{0,0,1,1,0,0},{0,0,
 int i;
 int j;
 int k;
+int reset = 0;
 String prev_state;
 
 void setup()
@@ -64,10 +65,10 @@ void loop(){
 //  Serial.println(pos);
   motorControl();
   
-//  Serial.print(" ");
-//  Serial.print(state + ' ' );
-//  Serial.print(pos);
-//  Serial.println(" -");
+  Serial.print(" ");
+  Serial.print(state + ' ' );
+  Serial.print(pos);
+  Serial.println(" -");
  
   // incoming message from server
   if (Serial.available()) {
@@ -98,23 +99,16 @@ void loop(){
    } 
   }
   // slider position change
-  if(userMovedSlider()){
+  if(userMovedSlider() && state != "motion"){
     prev_state = state;
     state = "motion";
   }
   
-  
-  
-  
-  
   if (state == "play"){
-    playMatrix();  
-  }
-  if (state == "pause"){
     pauseMatrix();  
   }
-  if (state == "reset"){
-    pauseMatrix();
+  else{
+    playMatrix();
   }
   
   
@@ -157,7 +151,7 @@ int getPos(){
   ePos = mEncoder.read();
   //Serial.println(ePos);
   if (ePos > ticks){
-    state = "reset";
+    reset = 1;
   }
   else if (ePos < 0){
     state = "play";
@@ -165,13 +159,17 @@ int getPos(){
       motorControl();
     }
     state = "pause";
+    reset = 0;
   }
   return ePos;
 }
 
 // checks if slider has been moved by user
 boolean userMovedSlider(){
-
+  ePos = mEncoder.read();
+  if (ePos < ePosOld){
+    return true;
+  }
   return false; 
 }
 
@@ -202,7 +200,7 @@ void motorControl(){
       digitalWrite(mPin3,LOW);
     }
   }
-  if (state == "reset"){
+  if (reset == 1){
 //    Serial.println("Reseting");
     analogWrite(mPin1,255);
     analogWrite(mPin2,0);
