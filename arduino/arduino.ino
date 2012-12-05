@@ -34,6 +34,7 @@ int gBool[6][6] = {{1,1,1,1,1,1},{1,1,1,1,1,1},{0,1,1,1,1,0},{0,0,1,1,0,0},{0,0,
 int i;
 int j;
 int k;
+String prev_state;
 
 void setup()
 {
@@ -91,10 +92,20 @@ void loop(){
     }
   }
 
+  if (state == "motion") {
+   if(!userMovedSlider()){
+     state = prev_state;
+   } 
+  }
   // slider position change
   if(userMovedSlider()){
-    //int new_pos = getPos();
+    prev_state = state;
+    state = "motion";
   }
+  
+  
+  
+  
   
   if (state == "play"){
     playMatrix();  
