@@ -90,6 +90,9 @@ function getState() {
             vidState = ytPlayer.getPlayerState();
             if (data.state == "sync" && vidState != 1 && vidState != 0) {
                 //The video should be playing
+                if (Math.abs(data.pos*ytPlayer.getDuration() - ytPlayer.getCurrentTime()) > 5) { //If more than 5 seconds off
+                    ytPlayer.seekTo(data.pos*ytPlayer.getDuration(), false);
+                }
                 ytPlayer.playVideo();
             }
             else if (data.state == "pause" && vidState != 2) {
