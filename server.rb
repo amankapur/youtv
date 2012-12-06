@@ -65,7 +65,7 @@ Thread.new do
                 state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
                         pos = pos.to_f
-                        #puts "a: " + a.to_s
+                        puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
                         pos = pos.to_f
 			if pos != nil
@@ -90,7 +90,10 @@ Thread.new do
                         puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
                         pos = pos.to_f
-	        end
+	        	if pos != nil
+				arduino_buffer[Time.now.iso8601] = pos
+		        end
+                end
 
 		sendSync(sp, client_buffer, arduino_buffer)
 	end # end while loop

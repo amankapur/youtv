@@ -3,6 +3,7 @@
 var serverLoop;
 var playerObj = null;
 var length, position = 0.0;
+var prev_state = "pause";
 
 $(document).on('ready', function(){
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
