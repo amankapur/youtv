@@ -1,5 +1,5 @@
 html { 
-background: url('../img/static.png') no-repeat center center fixed; 
+background: url('../img/color-bars.jpeg') no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -11,10 +11,10 @@ background: url('../img/static.png') no-repeat center center fixed;
   background-color: transparent;
 }
 #yt_vids {
-  margin: 0 auto;
-  margin-left: 30%;
-  margin-right: 40
-  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
 }
 
 :-webkit-full-screen #ytPlayer {
@@ -23,7 +23,7 @@ background: url('../img/static.png') no-repeat center center fixed;
 }
 
 #content {
-  width: 50%;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -37,11 +37,17 @@ background: url('../img/static.png') no-repeat center center fixed;
   margin-right: 5px;
 }
 
-#vidTitle {}
+#vidTitle {
+  font-weight: bold;
+}
 
 #vidViews {
   margin-top: 4px;
-  border-style: solid;
-  border-width: 1px;
   display: inline-block;
+}
+
+.col {
+  float: left;
+  margin-left: 30px;
+  width: 45%;
 }
