@@ -97,9 +97,8 @@ function getState() {
             }
 	    else if (data.state == "motion") {
                     var dur = data.pos * ytPlayer.getDuration();
-
-		ytPlayer.seekTo(dur, true);	
-                  console.log("JUMPED TO : " + dur.toString());
+		    ytPlayer.seekTo(dur, true);	
+                    console.log("JUMPED TO : " + data.pos);
 	    }
         }
     });

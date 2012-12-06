@@ -24,7 +24,7 @@ int ePosOld = 0;
 long start;
 long now;
 int firstPlay = 1;
-long vidLen = 11000;
+long vidLen = 0;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -189,7 +189,7 @@ void motorControl(){
   ePos = mEncoder.read();
   rightPos = floor((((now - start)/(float)vidLen)*ticks));
 //  Serial.println(ePos);
-  Serial.println(rightPos);
+  //Serial.println(rightPos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
@@ -200,26 +200,26 @@ void motorControl(){
       drive = 0;
     }
     if (drive == 1){
-      Serial.println("Driving");
+     // Serial.println("Driving");
       analogWrite(mPin1,0);
       analogWrite(mPin2,255);
       digitalWrite(mPin3,HIGH);
     }
     else{
-      Serial.println("Not driving but playing");
+      //Serial.println("Not driving but playing");
       analogWrite(mPin1,0);
       analogWrite(mPin2,150);
       digitalWrite(mPin3,LOW);
     }
   }
   if (reset == 1){
-    Serial.println("Reseting");
+    //Serial.println("Reseting");
     analogWrite(mPin1,255);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,HIGH);
   }
   if (state == "pause"){
-    Serial.println("Pausing");
+    //Serial.println("Pausing");
     analogWrite(mPin1,25);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);

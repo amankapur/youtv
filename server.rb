@@ -64,7 +64,7 @@ Thread.new do
                 if a.include?('pause')
                 state = 'pause'
 			pos = a[/\d+(?:\.\d+)?/]
-                        pos = pos.to_f/3328.0 
+                        pos = pos.to_f
                         #puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
                         pos = pos.to_f
@@ -78,7 +78,7 @@ Thread.new do
 			pos = a[/\d+(?:\.\d+)?/]
                         puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
-                        pos = pos.to_f/3328.0
+                        pos = pos.to_f
 			if pos != nil
 				arduino_buffer[Time.now.iso8601] = pos
 			end
@@ -89,7 +89,7 @@ Thread.new do
 	        	pos = a[/\d+(?:\.\d+)?/]
                         puts "a: " + a.to_s
                         puts "pos is : " + pos.to_s
-                        pos = pos.to_f/3328.0
+                        pos = pos.to_f
 	        end
 
 		sendSync(sp, client_buffer, arduino_buffer)
