@@ -8,7 +8,8 @@ var prev_state = "pause";
 $(document).on('ready', function(){
     var dev_key =  "AI39si6p8JyCYDoSBE6Fcv16d7Xykw_trX4LVPHooYk9Y5uaY3VlveaH3XYMJO-El2gcQ1J8woIsa1-lGzyBMtmD6uCmu1FJ_w"
     $('#search').submit(function() {
-        $("#yt_vids").html('');
+        $("#col0").html('');
+        $("#col1").html('');
         // get all the inputs into an array.
         var inputs = $('#search :input');
         var query = inputs.serializeArray()[0].value;
@@ -25,8 +26,10 @@ $(document).on('ready', function(){
                 var vid_url = temp.getAttribute('url');
                 var vid_id = youtube_id_from_url(vid_url);
                 var title = entry.find('title').text();
-                var html = '<div class="row"><a href="#"><img src = ' + thumbnail_url + ' onClick="loadPlayer(\'' + vid_id + '\')"></a> <h2>'+ title + ' </h2> </div>';
-                $("#yt_vids").append(html);
+                var views = $(entry.find("statistics")).attr('viewCount').toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); //Last part adds commas
+                var html = '<div class="row" id="vidRow"><div id="vidThumb"><a href="#"><img src = ' + thumbnail_url + ' onClick="loadPlayer(\'' + vid_id + '\')"></a></div><div id="vidTitle">'+ title + '</div><div id="vidViews">' + views + ' views</div></div>';
+                var appendTo = "#col" + vid%2;
+                $(appendTo).append(html);
             }
         });
     return false;
@@ -38,10 +41,11 @@ function loadPlayer(vid_id) {
     var params = { allowScriptAccess: "always" };
     // The element id of the Flash embed
     var atts = { id: "ytPlayer" };
-    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&version=3&enablejsapi=1&playerapiid=ytPlayer", 
+    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?controls=1&showinfo=0&modestbranding=1&iv_load_policy=3&version=3&enablejsapi=1&playerapiid=ytPlayer", 
                        "videoDiv", $(window).width().toString(), $(window).height().toString(), "9", null, null, params, atts);
     playerObj = $("object#ytPlayer");
     toggleFullScreen();
+    //player.setPlaybackQuality("large");
 }
 
 function onYouTubePlayerReady(playerid) {
