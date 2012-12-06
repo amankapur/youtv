@@ -71,37 +71,29 @@ void setup()
 }
  
 void loop(){
-  
- // Serial.print("RIGHT POS is ==========================================");
-  //Serial.println(rightPos);
-  
-//  Serial.print("vidlen is set to : ");
-//     Serial.println(vidLen);
+
   tNew = millis();
   if (state == "play"){
     tDelta += (tNew - tOld);  
   }
   tOld = tNew;
-//  Serial.println(tDelta);
   pos = getPos()/3328.0;
-//  Serial.print("POS IS : ");
-//  Serial.println(pos);
+
   Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
+
   // incoming message from server
   if (Serial.available()) {
       message = chkSer('-');
-      //Serial.println("message is : " + message);
       handleMessage(message);
-      
     }
+
  // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
       state = "play";
-      //Serial.println(state);
     } 
     else {
       state = "pause";;
@@ -113,6 +105,7 @@ void loop(){
      state = prev_state;
    } 
   }
+
   // slider position change
   if(userMovedSlider() && state != "motion" && reset == 0){
     prev_state = state;
@@ -138,7 +131,7 @@ void handleMessage(String mesg) {
   int i;
   char *pch;
   char msg[15];
-//  Serial.println(mesg);
+
   if (mesg.indexOf("u") > 0) return; //life is good, don't do anything
   if (mesg.indexOf("y") >0) {
     for (i = 0; i < mesg.length(); i++){
@@ -199,41 +192,21 @@ boolean userMovedSlider(){
     tDeltaOffset = floor(((posStart - posEnd)/(float)ticks)*vidLen);
     tDelta -= tDeltaOffset;
   }
-  //Serial.print("Epos ");
-  //Serial.println(ePos);
-  //Serial.print("RIGHT POS = ===================================== ");
-  //Serial.println(rightPos);
-  //Serial.print("FORWARD == : ");
-  //Serial.println(forward);
+
   if (forward == 0 && (ePos - rightPos) > posTolerance){
    // Serial.print("STATE IS IN F = 0          : ");
    // Serial.println(state);
     forward = 1;
     posStart = ePos;
   }
-  //Serial.print("Epos ");
-  //Serial.println(ePos);
-  //Serial.print("Eposold ");
-  //Serial.println(ePosOld);
-  //Serial.print("FORWARD == : ");
-  //Serial.println(forward);
+
   if (forward == 1 && ePos == ePosOld){
-    //Serial.print("STATE IS  IN F = 1         : ");
-    //Serial.println(state);
     forward = 0;
     posEnd = ePos;
     tDeltaOffset = floor(((posEnd - posStart)/(float)ticks)*vidLen);
     temp = (posTolerance/(float)ticks *vidLen)/2;
     tDelta += tDeltaOffset + temp;
   }
-//  Serial.print("Pos start ");
-//  Serial.println(posStart);s
-//  Serial.print("posEnd ");
-//  Serial.println(posEnd);
-//  Serial.print("tDeltaOffset : ");
-//  Serial.println(tDeltaOffset);
-//  Serial.print("tdelta : ");
-//  Serial.println(tDelta);
 
   if (forward == 1 || backward == 1)
   {
@@ -244,34 +217,21 @@ boolean userMovedSlider(){
 
 void motorControl(){
   ePos = mEncoder.read();
- // Serial.print("tDelta ");
- // Serial.println(tDelta);
- // Serial.print("vidLen ");
- // Serial.println(vidLen);
- // Serial.print("ticks ");
- // Serial.println(ticks);
- // Serial.print("tDelta/vidLen ");
- // Serial.println(tDelta / (float) vidLen);
   rightPos = (long) floor(((tDelta/(float)vidLen)*ticks));  
-//  Serial.println(ePos);
-//  Serial.println(rightPos);
+
   if (state == "play"){
     if (ePos < rightPos){
-//      Serial.println(ePos);
-//      Serial.println(rightPos);
       drive = 1;
     }
     else {
       drive = 0;
     }
     if (drive == 1){
-//      Serial.println("Driving");
       analogWrite(mPin1,0);
       analogWrite(mPin2,255);
       digitalWrite(mPin3,HIGH);
     }
     else{
-      //Serial.println("Not driving but playing");
       analogWrite(mPin1,0);
       analogWrite(mPin2,50);
       digitalWrite(mPin3,LOW);
@@ -283,13 +243,11 @@ void motorControl(){
     digitalWrite(mPin3,LOW);
   }
   if (reset == 1){
-    //Serial.println("Reseting");
     analogWrite(mPin1,255);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,HIGH);
   }
   if (state == "pause"){
-    //Serial.println("Pausing");
     analogWrite(mPin1,5);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);
@@ -315,12 +273,9 @@ String chkSer(char c){
   String content = "";
   char character;
   while(content.indexOf(c) <0){
-    // Serial.println('content');
     if(Serial.available() >0){
       character = Serial.read();
       content.concat(character);
-      //Serial.println(content);
-
     }
   }
   return content;
