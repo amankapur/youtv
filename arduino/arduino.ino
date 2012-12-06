@@ -71,6 +71,7 @@ void loop(){
   
 //  Serial.print("vidlen is set to : ");
 //     Serial.println(vidLen);
+
     
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
@@ -81,7 +82,6 @@ void loop(){
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
- 
   // incoming message from server
   if (Serial.available()) {
       message = chkSer('-');
