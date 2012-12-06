@@ -18,12 +18,12 @@ int buttonPin = BUTTON_PIN;
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 333;    // the debounce time; increase if the output flickers
 Encoder mEncoder(2, 3);
-int ePos = 0;
-int ePosOld = 0;
+long ePos = 0;
+long ePosOld = 0;
 int firstPlay = 1;
-long vidLen = 30000;
+long vidLen = 0;
 int ticks = 3328;
-int rightPos = 0;
+long rightPos = 0;
 int drive = 0;
 int cPins[6] = {A0,A1,A2,A3,A4,A5};
 int gnds[6] = {4,5,6,7,8,9};
@@ -36,8 +36,8 @@ String prev_state;
 long dragStart;
 long dragDuration = 0;
 long dragTimeOffset = 0;
-int posStart = 0;
-int posEnd = 0;
+long posStart = 0;
+long posEnd = 0;
 long tDelta = 0;
 long tNew = 0;
 long tOld = 0;
@@ -45,6 +45,7 @@ int backward;
 int forward;
 long tDeltaOffset;
 int posTolerance = 100; 
+float temp =0;
 
 void setup()
 {
@@ -70,6 +71,10 @@ void setup()
 }
  
 void loop(){
+  
+ // Serial.print("RIGHT POS is ==========================================");
+  //Serial.println(rightPos);
+  
 //  Serial.print("vidlen is set to : ");
 //     Serial.println(vidLen);
   tNew = millis();
@@ -81,7 +86,6 @@ void loop(){
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
 //  Serial.println(pos);
-  motorControl();
   Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
@@ -114,6 +118,7 @@ void loop(){
     prev_state = state;
     state = "motion";
   }
+ 
   
   if (state == "play"){
     pauseMatrix();  
@@ -121,7 +126,8 @@ void loop(){
   else{
     playMatrix();
   }
-  
+    motorControl();
+
   
 }
 
@@ -182,7 +188,7 @@ int getPos(){
 // checks if slider has been moved by user
 boolean userMovedSlider(){
   ePos = mEncoder.read();
-  rightPos = floor((((tDelta)/(float)vidLen)*ticks));
+
   if (backward == 0 && ePos < ePosOld){
     backward = 1;
     posStart = ePos;
@@ -193,24 +199,42 @@ boolean userMovedSlider(){
     tDeltaOffset = floor(((posStart - posEnd)/(float)ticks)*vidLen);
     tDelta -= tDeltaOffset;
   }
+  //Serial.print("Epos ");
+  //Serial.println(ePos);
+  //Serial.print("RIGHT POS = ===================================== ");
+  //Serial.println(rightPos);
+  //Serial.print("FORWARD == : ");
+  //Serial.println(forward);
   if (forward == 0 && (ePos - rightPos) > posTolerance){
+   // Serial.print("STATE IS IN F = 0          : ");
+   // Serial.println(state);
     forward = 1;
     posStart = ePos;
   }
+  //Serial.print("Epos ");
+  //Serial.println(ePos);
+  //Serial.print("Eposold ");
+  //Serial.println(ePosOld);
+  //Serial.print("FORWARD == : ");
+  //Serial.println(forward);
   if (forward == 1 && ePos == ePosOld){
+    //Serial.print("STATE IS  IN F = 1         : ");
+    //Serial.println(state);
     forward = 0;
     posEnd = ePos;
     tDeltaOffset = floor(((posEnd - posStart)/(float)ticks)*vidLen);
-    tDelta += tDeltaOffset;
+    temp = (posTolerance/(float)ticks *vidLen)/2;
+    tDelta += tDeltaOffset + temp;
   }
 //  Serial.print("Pos start ");
-//  Serial.println(posStart);
+//  Serial.println(posStart);s
 //  Serial.print("posEnd ");
 //  Serial.println(posEnd);
 //  Serial.print("tDeltaOffset : ");
 //  Serial.println(tDeltaOffset);
 //  Serial.print("tdelta : ");
 //  Serial.println(tDelta);
+
   if (forward == 1 || backward == 1)
   {
     return true;
@@ -220,7 +244,15 @@ boolean userMovedSlider(){
 
 void motorControl(){
   ePos = mEncoder.read();
-  rightPos = floor((((tDelta)/(float)vidLen)*ticks));  
+ // Serial.print("tDelta ");
+ // Serial.println(tDelta);
+ // Serial.print("vidLen ");
+ // Serial.println(vidLen);
+ // Serial.print("ticks ");
+ // Serial.println(ticks);
+ // Serial.print("tDelta/vidLen ");
+ // Serial.println(tDelta / (float) vidLen);
+  rightPos = (long) floor(((tDelta/(float)vidLen)*ticks));  
 //  Serial.println(ePos);
 //  Serial.println(rightPos);
   if (state == "play"){
@@ -241,12 +273,12 @@ void motorControl(){
     else{
       //Serial.println("Not driving but playing");
       analogWrite(mPin1,0);
-      analogWrite(mPin2,150);
+      analogWrite(mPin2,50);
       digitalWrite(mPin3,LOW);
     }
   }
   if (state == "motion"){
-    analogWrite(mPin1,25);
+    analogWrite(mPin1,5);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);
   }
@@ -258,7 +290,7 @@ void motorControl(){
   }
   if (state == "pause"){
     //Serial.println("Pausing");
-    analogWrite(mPin1,25);
+    analogWrite(mPin1,5);
     analogWrite(mPin2,0);
     digitalWrite(mPin3,LOW);
   }
