@@ -60,7 +60,8 @@ void setup()
   
   
   while(vidLen == 0){
-     //Serial.println("WtTF");
+    
+     Serial.println("WtTF");
      message = chkSer('-');
      handleMessage(message);
    }
@@ -78,7 +79,7 @@ void loop(){
 //  Serial.println(pos);
   motorControl();
   
-  Serial.print(" ");
+ Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
@@ -115,7 +116,7 @@ void loop(){
    } 
   }
   // slider position change
-  if(userMovedSlider() && state != "motion"){
+  if(userMovedSlider() && state != "motion" && reset == 0){
     prev_state = state;
     state = "motion";
   }
@@ -148,12 +149,10 @@ void handleMessage(String mesg) {
     pos2 = pch;
     pos = atof(pos2);
     return;
-
   }
 
-
-  if(mesg.indexOf("g") > 0){
-
+ if(mesg.indexOf("g") > 0){
+    Serial.println("WTF");
     for (i = 0; i < mesg.length(); i++){
       msg[i] = mesg[i];
     }
@@ -173,6 +172,7 @@ int getPos(){
   //Serial.println(ePos);
   if (ePos > ticks){
     reset = 1;
+    
   }
   else if (ePos < 0){
     reset = 0;

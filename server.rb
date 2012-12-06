@@ -48,17 +48,17 @@ def getMessage(sp)
 	end
 	return a       
 end
+
 Thread.new do
-	sp = SerialPort.new "/dev/ttyACM2", 9600
+	sp = SerialPort.new "/dev/ttyACM3", 9600
         
         while (vid_length == 0) # spin till video length is set by client
         end
-        
         puts "length is now " + vid_length.to_s
         str =  'length ' + vid_length.to_s + ' -'
         sp.write(str)
-
-       	while 1
+       	
+        while 1
                 a = getMessage(sp)
 
                 if a.include?('pause')
@@ -98,6 +98,7 @@ Thread.new do
 		sendSync(sp, client_buffer, arduino_buffer)
 	end # end while loop
 end
+
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 def herb(template, options={}, locals={})
   render "html.erb", template, options, locals
