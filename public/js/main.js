@@ -38,7 +38,7 @@ function loadPlayer(vid_id) {
     var params = { allowScriptAccess: "always" };
     // The element id of the Flash embed
     var atts = { id: "ytPlayer" };
-    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?version=3&enablejsapi=1&playerapiid=ytPlayer", 
+    swfobject.embedSWF("http://www.youtube.com/v/" + vid_id + "?controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&version=3&enablejsapi=1&playerapiid=ytPlayer", 
                        "videoDiv", $(window).width().toString(), $(window).height().toString(), "9", null, null, params, atts);
     playerObj = $("object#ytPlayer");
     toggleFullScreen();
