@@ -1,4 +1,3 @@
-// Approximately 6.5 turns for 3328 encoder ticks
 
 #include <stdlib.h>
 #include <Encoder.h>
@@ -21,10 +20,8 @@ long debounceDelay = 333;    // the debounce time; increase if the output flicke
 Encoder mEncoder(2, 3);
 int ePos = 0;
 int ePosOld = 0;
-long start;
-long now;
 int firstPlay = 1;
-long vidLen = 0;
+long vidLen = 30000;
 int ticks = 3328;
 int rightPos = 0;
 int drive = 0;
@@ -36,14 +33,18 @@ int j;
 int k;
 int reset = 0;
 String prev_state;
-long pauseStart;
-long pauseDuration = 0;
 long dragStart;
 long dragDuration = 0;
 long dragTimeOffset = 0;
-int posStart;
-int posEnd;
-long millisDelay = 0;
+int posStart = 0;
+int posEnd = 0;
+long tDelta = 0;
+long tNew = 0;
+long tOld = 0;
+int backward;
+int forward;
+long tDeltaOffset;
+int posTolerance = 100; 
 
 void setup()
 {
@@ -69,17 +70,19 @@ void setup()
 }
  
 void loop(){
-  
 //  Serial.print("vidlen is set to : ");
 //     Serial.println(vidLen);
-
-    
+  tNew = millis();
+  if (state == "play"){
+    tDelta += (tNew - tOld);  
+  }
+  tOld = tNew;
+//  Serial.println(tDelta);
   pos = getPos()/3328.0;
 //  Serial.print("POS IS : ");
 //  Serial.println(pos);
   motorControl();
-  
- Serial.print(" ");
+  Serial.print(" ");
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
@@ -93,20 +96,11 @@ void loop(){
  // play/pause button press
   if (buttonPress(buttonPin)) {
     if (state == "pause") {
-      if (firstPlay == 1){
-         start = millis();
-         firstPlay = 0;
-      }
-      else{
-        pauseDuration = pauseDuration + (millis() - pauseStart);
-      }
       state = "play";
       //Serial.println(state);
     } 
     else {
-      state = "pause";
-      pauseStart = millis();
-      //Serial.println(state);
+      state = "pause";;
     }
   }
 
@@ -188,38 +182,45 @@ int getPos(){
 // checks if slider has been moved by user
 boolean userMovedSlider(){
   ePos = mEncoder.read();
-  if (ePos < ePosOld){
-    if (state != "motion"){
-      dragStart = millis();
-      posStart = ePosOld;
-    }
+  rightPos = floor((((tDelta)/(float)vidLen)*ticks));
+  if (backward == 0 && ePos < ePosOld){
+    backward = 1;
+    posStart = ePos;
+  }
+  if (backward == 1 && ePos >= ePosOld){
+    backward = 0;
+    posEnd = ePos;
+    tDeltaOffset = floor(((posStart - posEnd)/(float)ticks)*vidLen);
+    tDelta -= tDeltaOffset;
+  }
+  if (forward == 0 && (ePos - rightPos) > posTolerance){
+    forward = 1;
+    posStart = ePos;
+  }
+  if (forward == 1 && ePos == ePosOld){
+    forward = 0;
+    posEnd = ePos;
+    tDeltaOffset = floor(((posEnd - posStart)/(float)ticks)*vidLen);
+    tDelta += tDeltaOffset;
+  }
+//  Serial.print("Pos start ");
+//  Serial.println(posStart);
+//  Serial.print("posEnd ");
+//  Serial.println(posEnd);
+//  Serial.print("tDeltaOffset : ");
+//  Serial.println(tDeltaOffset);
+//  Serial.print("tdelta : ");
+//  Serial.println(tDelta);
+  if (forward == 1 || backward == 1)
+  {
     return true;
   }
-  else{
-    if (state == "motion"){
-      posEnd = ePos;
-      dragDuration = dragDuration + millis() - dragStart;
-      //Serial.println("dragDuration");
-      //Serial.println(dragDuration);
-      dragTimeOffset = dragTimeOffset + (posStart - posEnd)*((float)vidLen/ticks);
-      //Serial.println("dragTimeOffset");
-      //Serial.println(dragTimeOffset);
-    }
-    return false; 
-  } 
+  return false;
 }
 
 void motorControl(){
-  now = millis();
   ePos = mEncoder.read();
-  if (dragDuration != 0 || pauseDuration != 0){
-    rightPos = floor((((now - start - pauseDuration - dragDuration - dragTimeOffset)/(float)vidLen)*ticks));
-    //Serial.println("rightPos wtih drag delay");
-    //Serial.println(rightPos);
-  }
-  else{
-    rightPos = floor((((now - start)/(float)vidLen)*ticks));  
-  }
+  rightPos = floor((((tDelta)/(float)vidLen)*ticks));  
 //  Serial.println(ePos);
 //  Serial.println(rightPos);
   if (state == "play"){
@@ -243,6 +244,11 @@ void motorControl(){
       analogWrite(mPin2,150);
       digitalWrite(mPin3,LOW);
     }
+  }
+  if (state == "motion"){
+    analogWrite(mPin1,25);
+    analogWrite(mPin2,0);
+    digitalWrite(mPin3,LOW);
   }
   if (reset == 1){
     //Serial.println("Reseting");
