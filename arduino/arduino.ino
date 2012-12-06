@@ -35,8 +35,15 @@ int i;
 int j;
 int k;
 int reset = 0;
-float tempPos = 0;
 String prev_state;
+long pauseStart;
+long pauseDuration = 0;
+long dragStart;
+long dragDuration = 0;
+long dragTimeOffset = 0;
+int posStart;
+int posEnd;
+long millisDelay = 0;
 
 void setup()
 {
@@ -75,7 +82,6 @@ void loop(){
   Serial.print(state + ' ' );
   Serial.print(pos);
   Serial.println(" -");
-
   // incoming message from server
   if (Serial.available()) {
       message = chkSer('-');
@@ -90,11 +96,15 @@ void loop(){
          start = millis();
          firstPlay = 0;
       }
+      else{
+        pauseDuration = pauseDuration + (millis() - pauseStart);
+      }
       state = "play";
       //Serial.println(state);
     } 
     else {
       state = "pause";
+      pauseStart = millis();
       //Serial.println(state);
     }
   }
@@ -179,17 +189,39 @@ int getPos(){
 boolean userMovedSlider(){
   ePos = mEncoder.read();
   if (ePos < ePosOld){
+    if (state != "motion"){
+      dragStart = millis();
+      posStart = ePosOld;
+    }
     return true;
   }
-  return false; 
+  else{
+    if (state == "motion"){
+      posEnd = ePos;
+      dragDuration = dragDuration + millis() - dragStart;
+      //Serial.println("dragDuration");
+      //Serial.println(dragDuration);
+      dragTimeOffset = dragTimeOffset + (posStart - posEnd)*((float)vidLen/ticks);
+      //Serial.println("dragTimeOffset");
+      //Serial.println(dragTimeOffset);
+    }
+    return false; 
+  } 
 }
 
 void motorControl(){
   now = millis();
   ePos = mEncoder.read();
-  rightPos = floor((((now - start)/(float)vidLen)*ticks));
+  if (dragDuration != 0 || pauseDuration != 0){
+    rightPos = floor((((now - start - pauseDuration - dragDuration - dragTimeOffset)/(float)vidLen)*ticks));
+    //Serial.println("rightPos wtih drag delay");
+    //Serial.println(rightPos);
+  }
+  else{
+    rightPos = floor((((now - start)/(float)vidLen)*ticks));  
+  }
 //  Serial.println(ePos);
-  //Serial.println(rightPos);
+//  Serial.println(rightPos);
   if (state == "play"){
     if (ePos < rightPos){
 //      Serial.println(ePos);
@@ -200,7 +232,7 @@ void motorControl(){
       drive = 0;
     }
     if (drive == 1){
-     // Serial.println("Driving");
+//      Serial.println("Driving");
       analogWrite(mPin1,0);
       analogWrite(mPin2,255);
       digitalWrite(mPin3,HIGH);
