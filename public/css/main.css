@@ -1,5 +1,5 @@
 html { 
-background: url('../img/color-bars.jpeg') no-repeat center center fixed; 
+background: url('../img/static.png') no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -29,7 +29,7 @@ background: url('../img/color-bars.jpeg') no-repeat center center fixed;
 }
 
 #vidRow {
-  margin-bottom: 10px;
+  margin: 10px;
 }
 
 #vidThumb {
@@ -50,4 +50,5 @@ background: url('../img/color-bars.jpeg') no-repeat center center fixed;
   float: left;
   margin-left: 30px;
   width: 45%;
+  background-color:rgba(255,255,255,0.9)
 }
